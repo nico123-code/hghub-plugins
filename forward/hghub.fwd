@@ -1,7 +1,7 @@
 {
   "title": "HGhub 影视 / 短剧模块",
   "description": "nico123-code/hghub-plugins 的 Rex / Forward 模块合集",
-  "icon": "https://huangguoai.com/static/web/images/logo-huangguo.png",
+  "icon": "https://hghub-icons.hghub-zhang.workers.dev/anime.png",
   "widgets": [
     {
       "id": "hghub.huangguo",
