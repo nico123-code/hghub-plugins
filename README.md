@@ -53,6 +53,24 @@
 
 标了 `mature: true` 的源，宿主默认隐藏，需在设置里打开成人内容后再导入或启用。
 
+## Rex / Forward 模块
+
+`forward/` 目录是给 iOS 播放器 Rex / Forward 用的 ForwardWidget 模块（与 HGhub 插件互不影响）。
+
+| 模块 | 文件 | 功能 |
+| --- | --- | --- |
+| 黄果短剧 `hghub.huangguo` | `forward/huangguo.js` | 全部 / 分类（短剧、漫剧）、排行榜（热播 / 推荐 / 潜力）、搜索、分集列表、HLS 播放 |
+
+订阅地址（在 Rex / Forward 的「模块 → 添加订阅」里粘贴）：
+
+```
+https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/hghub.fwd
+```
+
+也可以只导入单个模块：`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js`
+
+封面：黄果的封面图是 AES 加密的，Rex / Forward 不能解码，默认不显示封面。想要封面的话，把 `forward/cover-proxy-worker.js` 部署成 Cloudflare Worker，再在模块全局参数「封面解密代理」里填 `https://<你的子域>.workers.dev/?url=`。
+
 ## 重新生成订阅列表
 
 增删 `plugins/*.js` 后执行：
