@@ -1,5 +1,5 @@
 /**
- * iKanPP 爱看片片 · Rex / Forward 模块（ForwardWidget 格式）
+ * 影视聚合（iKanPP）· Rex / Forward 模块（ForwardWidget 格式）
  * 站点：https://www.ikanpp.com （影视聚合站，多播放源）
  *
  * 说明：
@@ -12,11 +12,11 @@
  */
 WidgetMetadata = {
   id: "hghub.ikanpp",
-  title: "爱看片片",
-  description: "iKanPP 爱看片片：电影、剧集、动漫、综艺、纪录片、短剧，多线路播放",
+  title: "影视聚合",
+  description: "影视聚合：电影、剧集、动漫、综艺、纪录片、短剧，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.1",
+  version: "2026.11.23.2",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
