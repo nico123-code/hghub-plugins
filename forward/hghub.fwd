@@ -6,9 +6,9 @@
     {
       "id": "hghub.huangguo",
       "title": "黄果短剧",
-      "description": "黄果短剧：分类、榜单、搜索、分集播放（18+）",
+      "description": "黄果短剧：分类、题材标签、榜单、搜索、分集播放（18+）",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.23",
+      "version": "2026.11.23.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js"
     }
