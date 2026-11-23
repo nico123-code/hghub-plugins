@@ -15,9 +15,9 @@
     {
       "id": "hghub.ikanpp",
       "title": "影视聚合",
-      "description": "影视聚合：电影、剧集、动漫、综艺、纪录片、短剧，多线路播放",
+      "description": "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，三站聚合搜索，多线路播放",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.23.3",
+      "version": "2026.11.23.4",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js"
     },
