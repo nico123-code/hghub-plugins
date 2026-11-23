@@ -15,7 +15,7 @@ WidgetMetadata = {
   "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.23.7",
+  "version": "2026.11.23.8",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -1744,8 +1744,9 @@ function ggDecode(s) {
 function ggImg(u) {
   if (!u || typeof u !== "string") return "";
   if (u.indexOf("//") === 0) return "https:" + u;
-  if (u.charAt(0) === "/") return GG_SITE + u;
-  return u;
+  if (/^https?:\/\//i.test(u)) return u;
+  // 详情接口给的是相对路径（upload/vod/...），图片实际在 jpg.girigirilove.com
+  return "https://jpg.girigirilove.com/" + u.replace(/^\/+/, "");
 }
 
 function ggPage(params) {
