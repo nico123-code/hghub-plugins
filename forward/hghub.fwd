@@ -24,9 +24,9 @@
     {
       "id": "hghub.anime",
       "title": "动漫聚合",
-      "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、MuteFun（周表/分类），girigiri+AGE 聚合搜索，多线路播放",
+      "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.23.1",
+      "version": "2026.11.23.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js"
     }

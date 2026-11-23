@@ -3,16 +3,16 @@
  * 收录站点：
  *  - girigiri爱动漫  ani.girigirilove.com（苹果CMS 接口 https://m3u8.girigirilove.com/api.php，不加密的 m3u8/mp4 直链）
  *  - AGE动漫        www.agedm.io（HTML 解析；播放走站点自己的解析页，取明文 m3u8，VIP 加密线路跳过）
- *  - MuteFun动漫     www.mutedm.com（HTML 解析；播放页里直接有 mp4/m3u8。站内搜索开了人机验证，所以只做浏览，不做搜索）
- * 链接格式：<站>:<id>:<集序号>，站 = gg / age / mf
+ *  - 稀饭动漫        next.xifanacg.com（列表解析站点页面；搜索/详情/播放用站点前端自己的公开接口，匿名 key 运行时从站点前端脚本读取）
+ * 链接格式：<站>:<id>:<集序号>，站 = gg / age / xf
  */
 WidgetMetadata = {
   "id": "hghub.anime",
   "title": "动漫聚合",
-  "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、MuteFun（周表/分类），girigiri+AGE 聚合搜索，多线路播放",
+  "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.23.1",
+  "version": "2026.11.23.2",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -1269,9 +1269,22 @@ WidgetMetadata = {
       ]
     },
     {
-      "id": "mf_week",
-      "title": "MuteFun·追番周表",
-      "functionName": "loadMfWeek",
+      "id": "xf_recent",
+      "title": "稀饭·最近更新",
+      "functionName": "loadXfRecent",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "xf_week",
+      "title": "稀饭·新番时间表",
+      "functionName": "loadXfWeek",
       "cacheDuration": 300,
       "params": [
         {
@@ -1322,36 +1335,300 @@ WidgetMetadata = {
       ]
     },
     {
-      "id": "mf_list",
-      "title": "MuteFun·分类",
-      "functionName": "loadMfList",
+      "id": "xf_browse",
+      "title": "稀饭·番剧目录",
+      "functionName": "loadXfBrowse",
       "cacheDuration": 300,
       "params": [
         {
-          "name": "kind",
-          "title": "分类",
+          "name": "sort",
+          "title": "排序",
           "type": "enumeration",
-          "value": "new",
+          "value": "release_date",
           "enumOptions": [
             {
-              "title": "今日更新",
-              "value": "new"
+              "title": "最新",
+              "value": "release_date"
             },
             {
-              "title": "日漫",
-              "value": "20"
+              "title": "新上架",
+              "value": "created_at"
             },
             {
-              "title": "美漫",
-              "value": "24"
+              "title": "热度",
+              "value": "view_count"
             },
             {
-              "title": "特摄",
-              "value": "25"
+              "title": "评分",
+              "value": "bangumi_score"
             },
             {
-              "title": "日剧",
-              "value": "26"
+              "title": "名称",
+              "value": "title"
+            }
+          ]
+        },
+        {
+          "name": "format",
+          "title": "类型",
+          "type": "enumeration",
+          "value": "all",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": "all"
+            },
+            {
+              "title": "TV 动画",
+              "value": "tv"
+            },
+            {
+              "title": "剧场版",
+              "value": "movie"
+            },
+            {
+              "title": "OVA",
+              "value": "ova"
+            },
+            {
+              "title": "OAD",
+              "value": "oad"
+            },
+            {
+              "title": "Web 动画",
+              "value": "web"
+            },
+            {
+              "title": "其他",
+              "value": "other"
+            }
+          ]
+        },
+        {
+          "name": "tag",
+          "title": "题材",
+          "type": "enumeration",
+          "value": "all",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": "all"
+            },
+            {
+              "title": "漫画改",
+              "value": "漫画改"
+            },
+            {
+              "title": "小说改",
+              "value": "小说改"
+            },
+            {
+              "title": "奇幻",
+              "value": "奇幻"
+            },
+            {
+              "title": "战斗",
+              "value": "战斗"
+            },
+            {
+              "title": "原创",
+              "value": "原创"
+            },
+            {
+              "title": "恋爱",
+              "value": "恋爱"
+            },
+            {
+              "title": "校园",
+              "value": "校园"
+            },
+            {
+              "title": "日常",
+              "value": "日常"
+            },
+            {
+              "title": "百合",
+              "value": "百合"
+            },
+            {
+              "title": "后宫",
+              "value": "后宫"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "游戏改",
+              "value": "游戏改"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "冒险",
+              "value": "冒险"
+            },
+            {
+              "title": "穿越",
+              "value": "穿越"
+            },
+            {
+              "title": "音乐",
+              "value": "音乐"
+            },
+            {
+              "title": "运动",
+              "value": "运动"
+            },
+            {
+              "title": "机战",
+              "value": "机战"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "少年向",
+              "value": "少年向"
+            },
+            {
+              "title": "推理",
+              "value": "推理"
+            },
+            {
+              "title": "少女向",
+              "value": "少女向"
+            },
+            {
+              "title": "职场",
+              "value": "职场"
+            },
+            {
+              "title": "美食",
+              "value": "美食"
+            },
+            {
+              "title": "青年向",
+              "value": "青年向"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "all",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": "all"
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            },
+            {
+              "title": "2018",
+              "value": "2018"
+            },
+            {
+              "title": "2017",
+              "value": "2017"
+            },
+            {
+              "title": "2016",
+              "value": "2016"
+            },
+            {
+              "title": "2015",
+              "value": "2015"
+            },
+            {
+              "title": "2014",
+              "value": "2014"
+            },
+            {
+              "title": "2013",
+              "value": "2013"
+            },
+            {
+              "title": "2012",
+              "value": "2012"
+            },
+            {
+              "title": "2011",
+              "value": "2011"
+            },
+            {
+              "title": "2010",
+              "value": "2010"
+            },
+            {
+              "title": "2009",
+              "value": "2009"
+            },
+            {
+              "title": "2008",
+              "value": "2008"
+            },
+            {
+              "title": "2007",
+              "value": "2007"
+            },
+            {
+              "title": "更早",
+              "value": "older"
+            }
+          ]
+        },
+        {
+          "name": "finished",
+          "title": "状态",
+          "type": "enumeration",
+          "value": "all",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": "all"
+            },
+            {
+              "title": "连载中",
+              "value": "0"
+            },
+            {
+              "title": "完结",
+              "value": "1"
             }
           ]
         },
@@ -1388,7 +1665,7 @@ WidgetMetadata = {
         "value": "all",
         "enumOptions": [
           {
-            "title": "全部（girigiri + AGE）",
+            "title": "全部（girigiri + AGE + 稀饭）",
             "value": "all"
           },
           {
@@ -1398,6 +1675,10 @@ WidgetMetadata = {
           {
             "title": "AGE",
             "value": "age"
+          },
+          {
+            "title": "稀饭",
+            "value": "xf"
           }
         ]
       },
@@ -1701,9 +1982,9 @@ async function anHtml(url, referer) {
   return body;
 }
 
-// link 格式：<站>:<id>:<集序号,0=整部>，站 = gg / age / mf
+// link 格式：<站>:<id>:<集序号,0=整部>，站 = gg / age / xf
 function anParseLink(link) {
-  var m = String(link || "").match(/^(gg|age|mf):([A-Za-z0-9_-]+):(\d+)$/);
+  var m = String(link || "").match(/^(gg|age|xf):([A-Za-z0-9_-]+):(\d+)$/);
   if (!m) return null;
   return { site: m[1], id: m[2], ep: parseInt(m[3], 10) || 0 };
 }
@@ -1908,62 +2189,127 @@ async function ageResolve(playUrl) {
 }
 
 // ======================================================================
-// MuteFun 动漫（www.mutedm.com）—— 站内搜索有人机验证，所以只做按站浏览
+// 稀饭动漫（next.xifanacg.com）
+//  列表：站点自己的页面（/recent /schedule /browse）
+//  搜索 / 详情 / 播放：站点前端自己用的公开接口（rpc/search_animes、rpc/get_anime_detail、
+//  functions/v1/issue-web-playback action=fallback，和网页未登录时一样）
+//  接口用的是站点前端公开下发的匿名 key：运行时从站点自己的前端脚本里读，不写死在模块里
 // ======================================================================
-var MF_SITE = "https://www.mutedm.com";
+var XF_SITE = "https://next.xifanacg.com";
+var XF_API = "https://api.xifanacg.com";
+var XF_KEY_STORE = "hghub_anime_xf_key";
 
-function mfCheck(html) {
-  if (/<title>\s*安全验证/.test(html) || html.indexOf("/captcha/verify") >= 0) {
-    throw new Error("MuteFun 要求人机验证，请稍后再试或换其他站");
-  }
+function xfCover(u, size) {
+  u = String(u || "");
+  if (!u) return "";
+  if (/\/r\/\d+\/pic\//.test(u)) return u.replace(/\/r\/\d+\/pic\//, "/r/" + (size || 400) + "/pic/");
+  return u.replace(/(https?:\/\/[^/]+)\/pic\//, "$1/r/" + (size || 400) + "/pic/");
 }
 
-function mfParseCards(html) {
+async function xfKey(force) {
+  if (!force) {
+    try {
+      var c = Widget.storage.get(XF_KEY_STORE);
+      if (c && typeof c === "string") c = JSON.parse(c);
+      if (c && c.k && Date.now() - c.t < 24 * 3600 * 1000) return c.k;
+    } catch (e) {}
+  }
+  var html = await anHtml(XF_SITE + "/", XF_SITE + "/");
+  var chunks = [];
+  var re = /src="(\/_next\/static\/chunks\/[A-Za-z0-9_.-]+\.js)"/g;
+  var m;
+  while ((m = re.exec(html))) if (chunks.indexOf(m[1]) < 0) chunks.push(m[1]);
+  var rk = /"https:\/\/api\.xifanacg\.com","(sb_publishable_[A-Za-z0-9_-]+)"/;
+  var rk2 = /(sb_publishable_[A-Za-z0-9_-]{10,})/;
+  // 从后往前、5 个一批并发找（key 一般在比较靠后的大包里）
+  chunks.reverse();
+  for (var i = 0; i < chunks.length; i += 5) {
+    var batch = chunks.slice(i, i + 5);
+    var found = await Promise.all(batch.map(function (c) {
+      return anHtml(XF_SITE + c, XF_SITE + "/").then(function (js) {
+        var k = (js.match(rk) || js.match(rk2) || [])[1];
+        return k || null;
+      }, function () { return null; });
+    }));
+    for (var j = 0; j < found.length; j++) {
+      if (found[j]) {
+        try { Widget.storage.set(XF_KEY_STORE, JSON.stringify({ k: found[j], t: Date.now() })); } catch (e) {}
+        return found[j];
+      }
+    }
+  }
+  throw new Error("稀饭：读取站点接口配置失败");
+}
+
+async function xfPost(path, body, retried) {
+  var k = await xfKey(!!retried);
+  var res = await Widget.http.post(XF_API + path, body || {}, {
+    headers: {
+      "User-Agent": AN_UA,
+      "Content-Type": "application/json",
+      apikey: k,
+      Authorization: "Bearer " + k,
+      Origin: XF_SITE,
+      Referer: XF_SITE + "/",
+    },
+  });
+  var code = res && (res.statusCode || res.status);
+  if ((code === 401 || code === 403) && !retried) return xfPost(path, body, true);
+  var d = res && res.data;
+  if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) {} }
+  return d;
+}
+
+function xfItem(a) {
+  var link = anMakeLink("xf", String(a.id), 0);
+  var it = { id: link, type: "url", title: anDecode(a.title), mediaType: a.format === "movie" ? "movie" : "tv", link: link };
+  var c = xfCover(a.cover_url);
+  if (c) { it.posterPath = c; it.coverUrl = c; }
+  if (a.release_year) it.releaseDate = String(a.release_year);
+  if (a.bangumi_score) it.rating = Number(a.bangumi_score) || undefined;
+  if (a.description) it.description = String(a.description).replace(/\r/g, "");
+  var g = ["稀饭"];
+  if (a.anime_type && a.anime_type.name) g.push(a.anime_type.name);
+  it.genreTitle = g.join(" / ");
+  if (a.current_episodes != null) {
+    it.durationText = a.is_finished ? "全 " + (a.total_episodes || a.current_episodes) + " 集" : "更新至 " + a.current_episodes + (a.total_episodes ? " / " + a.total_episodes : "");
+  }
+  return it;
+}
+
+// 站点页面里的卡片：<a aria-label="名字" href="/anime/<id>"> … <img src=封面> … 评分/集数
+function xfParseCards(html) {
   var out = [];
   var seen = {};
-  var re = /<a class="video-card"\s+href="https:\/\/www\.mutedm\.com\/video\/(\d+)"[^>]*>([\s\S]*?)<\/a>/g;
+  var re = /<a aria-label="([^"]*)"[^>]*href="\/anime\/(\d+)"[^>]*>([\s\S]*?)<\/a>/g;
   var m;
   while ((m = re.exec(html))) {
-    if (seen[m[1]]) continue;
-    seen[m[1]] = true;
-    var p = m[2];
-    var title = anDecode((p.match(/video-card-title">([^<]*)</) || [])[1]);
-    if (!title) continue;
-    var link = anMakeLink("mf", m[1], 0);
-    var it = { id: link, type: "url", title: title, mediaType: "tv", link: link, genreTitle: "MuteFun" };
-    var cover = anDecode((p.match(/<img[^>]*src="([^"]+)"/) || [])[1]);
-    if (cover) { it.posterPath = cover; it.coverUrl = cover; }
-    var st = anDecode((p.match(/poster-status">([^<]*)</) || [])[1]);
+    if (seen[m[2]]) continue;
+    seen[m[2]] = true;
+    var body = m[3];
+    var link = anMakeLink("xf", m[2], 0);
+    var it = { id: link, type: "url", title: anDecode(m[1]), mediaType: "tv", link: link, genreTitle: "稀饭" };
+    var c = xfCover((body.match(/ src="(https?:\/\/[^"]+)"/) || [])[1]);
+    if (c) { it.posterPath = c; it.coverUrl = c; }
+    var sc = (body.match(/aria-label="评分 ([\d.]+)"/) || [])[1];
+    if (sc) it.rating = Number(sc);
+    var txt = anDecode(body.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ");
+    var st = (txt.match(/(更新至 [\d.]+(?: \/ \d+)?|全 \d+ 集|EP[\d.]+)/) || [])[1];
     if (st) it.durationText = st;
+    var y = (txt.match(/· (\d{4})/) || [])[1];
+    if (y) it.releaseDate = y;
+    if (/剧场版/.test(txt)) it.mediaType = "movie";
     out.push(it);
   }
   return out;
 }
 
-async function loadMfList(params) {
-  params = params || {};
-  var page = anPage(params);
-  var kind = String(params.kind || "new");
-  var url;
-  if (kind === "new") {
-    if (page > 1) return [];
-    url = MF_SITE + "/new";
-  } else {
-    url = MF_SITE + "/category/" + encodeURIComponent(kind) + (page > 1 ? "?page=" + page : "");
-  }
-  var html = await anHtml(url, MF_SITE + "/");
-  mfCheck(html);
-  if (kind !== "new" && page > 1) {
-    var max = ageMaxPage(html, /[?&;]page=(\d+)/g);
-    if (page > max) return [];
-  }
-  // 分类页第 1 页顶部还有一块“最近更新”，只取“全部 xx”那一块，避免和第 2 页重复
-  var all = html.indexOf("ALL TITLES");
-  if (all > 0) html = html.slice(all);
-  return mfParseCards(html);
+async function loadXfRecent(params) {
+  if (anPage(params) > 1) return [];
+  return xfParseCards(await anHtml(XF_SITE + "/recent", XF_SITE + "/"));
 }
 
-async function loadMfWeek(params) {
+async function loadXfWeek(params) {
   params = params || {};
   if (anPage(params) > 1) return [];
   var w = String(params.week || "today");
@@ -1971,50 +2317,88 @@ async function loadMfWeek(params) {
     var d = new Date(Date.now() + 8 * 3600 * 1000).getUTCDay();
     w = d === 0 ? "7" : String(d);
   }
-  var html = await anHtml(MF_SITE + "/week?day=" + w, MF_SITE + "/");
-  mfCheck(html);
-  return mfParseCards(html);
+  var idx = parseInt(w, 10) - 1; // 站点 day-0 = 周一
+  var html = await anHtml(XF_SITE + "/schedule", XF_SITE + "/");
+  var start = html.indexOf('id="day-' + idx + '"');
+  if (start < 0) return [];
+  var end = html.indexOf('id="day-' + (idx + 1) + '"', start);
+  if (end < 0) end = html.indexOf("</main>", start);
+  return xfParseCards(html.slice(start, end > 0 ? end : undefined));
 }
 
-async function mfDetailRaw(id) {
-  var html = await anHtml(MF_SITE + "/video/" + id, MF_SITE + "/");
-  mfCheck(html);
-  var lines = [];
-  var panels = html.split("data-source-panel");
-  for (var i = 1; i < panels.length; i++) {
-    var p = panels[i];
-    var end = p.indexOf("</section>");
-    if (end > 0) p = p.slice(0, end);
-    var name = anDecode((p.match(/episode-source-title">([^<]*)</) || [])[1]) || "线路" + i;
-    var eps = [];
-    var re = /href="(https:\/\/www\.mutedm\.com\/video\/\d+\/play\/\d+\/\d+)"[^>]*>\s*<span class="episode-label">([^<]*)</g;
-    var e;
-    var seen = {};
-    while ((e = re.exec(p))) {
-      if (seen[e[1]]) continue;
-      seen[e[1]] = true;
-      eps.push({ name: anDecode(e[2]), url: e[1] });
-    }
-    if (eps.length) lines.push({ from: "m" + i, name: name, episodes: eps });
+async function loadXfBrowse(params) {
+  params = params || {};
+  var page = anPage(params);
+  var q = [];
+  if (params.sort && params.sort !== "title") q.push("sort=" + encodeURIComponent(params.sort));
+  if (params.format && params.format !== "all") q.push("format=" + encodeURIComponent(params.format));
+  if (params.tag && params.tag !== "all") q.push("tag=" + encodeURIComponent(params.tag));
+  if (params.year && params.year !== "all") {
+    if (params.year === "older") q.push("older=1");
+    else q.push("year=" + encodeURIComponent(params.year));
   }
+  if (params.finished && params.finished !== "all") q.push("finished=" + encodeURIComponent(params.finished));
+  if (page > 1) q.push("page=" + page);
+  var res = await Widget.http.get(XF_SITE + "/browse" + (q.length ? "?" + q.join("&") : ""), {
+    headers: { "User-Agent": AN_UA, Accept: "text/html,application/xhtml+xml,*/*;q=0.8", Referer: XF_SITE + "/" },
+  });
+  var html = res && res.data;
+  if (typeof html !== "string") return [];
+  return xfParseCards(html); // 越界页站点返回 400 / 空列表
+}
+
+async function xfSearch(kw, page) {
+  var d = await xfPost("/rest/v1/rpc/search_animes", { search_term: kw, page_number: page, items_per_page: 24 });
+  if (!Array.isArray(d)) return [];
+  return d.map(xfItem);
+}
+
+function xfEpName(e, i) {
+  if (e.kind === "main" && e.episode_number != null) {
+    var n = Number(e.episode_number);
+    return "第" + (n % 1 === 0 ? n.toFixed(0) : String(n)) + "集";
+  }
+  return anDecode(e.title) || "第" + (i + 1) + "集";
+}
+
+async function xfDetailRaw(id) {
+  var d = await xfPost("/rest/v1/rpc/get_anime_detail", { p_id: parseInt(id, 10) });
+  if (Array.isArray(d)) d = d[0];
+  if (!d || !d.anime) throw new Error("稀饭：找不到这部番（可能需要登录才能看）");
+  var a = d.anime;
+  var lines = [];
+  (d.sources || []).forEach(function (s) {
+    var eps = (s.episodes || []).map(function (e, i) {
+      var t = anDecode(e.title);
+      return { name: xfEpName(e, i), title: t, url: e.id + ":" + s.id };
+    });
+    if (eps.length) lines.push({ from: s.code, name: anDecode(s.name) || s.code, episodes: eps });
+  });
+  var info = {};
+  if (a.format === "movie") info["动画种类"] = "剧场版";
+  if (a.region) info["地区"] = a.region;
+  if (Array.isArray(a.meta_tags) && a.meta_tags.length) info["标签"] = a.meta_tags.filter(function (t) { return t !== "TV" && t !== a.region; }).join(" ");
+  if (a.release_date) info["首播时间"] = a.release_date;
   return {
-    id: id,
-    title: anDecode((html.match(/<meta property="og:title" content="([^"]+)"/) || [])[1]).replace(/\s*-\s*MuteFun动漫\s*$/, ""),
-    cover: anDecode((html.match(/<meta property="og:image" content="([^"]+)"/) || [])[1]),
-    desc: anDecode((html.match(/<meta property="og:description" content="([^"]+)"/) || [])[1]),
+    id: String(a.id || id),
+    title: anDecode(a.title),
+    cover: xfCover(a.cover_url, 600),
+    desc: String(a.description || "").replace(/\r/g, ""),
+    info: info,
     lines: lines,
   };
 }
 
-async function mfResolve(playUrl) {
-  var html = await anHtml(playUrl, MF_SITE + "/");
-  mfCheck(html);
-  var m = html.match(/source:\s*("(?:[^"\\]|\\.)*")/);
-  if (!m) return null;
-  var u;
-  try { u = JSON.parse(m[1]); } catch (e) { return null; }
-  if (!/^https?:\/\//i.test(u)) return null;
-  return encodeURI(decodeURI(u));
+async function xfResolve(epUrl) {
+  var p = String(epUrl || "").split(":");
+  var body = { action: "fallback", episode_id: parseInt(p[0], 10) };
+  if (p[1]) body.source_id = parseInt(p[1], 10);
+  var d = await xfPost("/functions/v1/issue-web-playback", body);
+  if (!d || !d.ok) return null;
+  var u = d.url || (d.candidates && d.candidates[0] && d.candidates[0].url);
+  if (!u || !/^https?:\/\//i.test(u)) return null;
+  try { u = encodeURI(decodeURI(u)); } catch (e) {}
+  return u;
 }
 
 // ======================================================================
@@ -2047,6 +2431,7 @@ async function search(params) {
   var jobs = [];
   if (site === "all" || site === "gg") jobs.push(ggSearchItems(kw, page).then(function (r) { return anTag(r, "girigiri"); }));
   if (site === "all" || site === "age") jobs.push(ageSearch(kw, page).then(function (r) { return anTag(r, "AGE"); }));
+  if (site === "all" || site === "xf") jobs.push(xfSearch(kw, page).then(function (r) { return anTag(r, "稀饭"); }));
   var results = await Promise.all(jobs.map(function (j) { return j.catch(function () { return []; }); }));
   var out = [];
   results.forEach(function (r) { out = out.concat(r || []); });
@@ -2115,8 +2500,8 @@ async function loadDetail(link) {
     });
     return it;
   }
-  var raw = ref.site === "age" ? await ageDetailRaw(ref.id) : await mfDetailRaw(ref.id);
-  var item = anBuildDetail(ref.site, raw, ref, ref.site === "age" ? "AGE" : "MuteFun");
+  var raw = ref.site === "age" ? await ageDetailRaw(ref.id) : await xfDetailRaw(ref.id);
+  var item = anBuildDetail(ref.site, raw, ref, ref.site === "age" ? "AGE" : "稀饭");
   // 兜底：先解析出一个能直接播的地址（当前集，没有就第 1 集）
   var primary = anPrimary(raw.lines);
   if (primary) {
@@ -2126,7 +2511,7 @@ async function loadDetail(link) {
       var ep = anFindEp(order[i], primary, idx);
       if (!ep) continue;
       try {
-        var u = ref.site === "age" ? await ageResolve(ep.url) : await mfResolve(ep.url);
+        var u = ref.site === "age" ? await ageResolve(ep.url) : await xfResolve(ep.url);
         if (u) { item.videoUrl = u; item.playerType = "app"; break; }
       } catch (e) {}
     }
@@ -2146,7 +2531,7 @@ async function loadResource(params) {
     return ggLoadResource({ link: ggMakeLink(ref.id, ref.ep), episode: params.episode });
   }
   var epNo = ref.ep || parseInt(params.episode, 10) || 1;
-  var raw = ref.site === "age" ? await ageDetailRaw(ref.id) : await mfDetailRaw(ref.id);
+  var raw = ref.site === "age" ? await ageDetailRaw(ref.id) : await xfDetailRaw(ref.id);
   var primary = anPrimary(raw.lines);
   if (!primary) return [];
   var idx = Math.max(0, epNo - 1);
@@ -2157,11 +2542,11 @@ async function loadResource(params) {
   order.sort(function (a, b) { return (a.vip ? 1 : 0) - (b.vip ? 1 : 0); });
   order = order.slice(0, 8);
   var site = ref.site;
-  var referer = site === "age" ? AGE_SITE + "/" : MF_SITE + "/";
+  var referer = site === "age" ? AGE_SITE + "/" : XF_SITE + "/";
   var resolved = await Promise.all(order.map(function (line) {
     var ep = anFindEp(line, primary, idx);
     if (!ep) return Promise.resolve(null);
-    var p = site === "age" ? ageResolve(ep.url) : mfResolve(ep.url);
+    var p = site === "age" ? ageResolve(ep.url) : xfResolve(ep.url);
     return p.then(function (u) { return u ? { line: line, url: u } : null; }, function () { return null; });
   }));
   var out = [];
