@@ -43,6 +43,13 @@
       "version": "1.0.1",
       "url": "plugins/xingya.js",
       "description": "星芽短剧 App 接口：分类、搜索、详情与直链播放。登录令牌保存在插件存储中。"
+    },
+    {
+      "id": "yysub",
+      "name": "人人影视",
+      "version": "1.0.0",
+      "url": "plugins/yysub.js",
+      "description": "人人影视（YYeTs）：美剧/电影/公开课分类、排行、搜索与分季资源列表。站点只提供磁力/电驴下载链接，播放时交给外部下载或播放 App 打开。"
     }
   ]
 }

@@ -12,8 +12,8 @@
 
 | 列表 | 内容 | GitHub Raw | jsDelivr |
 | --- | --- | --- | --- |
-| 全部 | 12 个源（含成人） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/manifest.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/manifest.json` |
-| 影视 | 6 个影视 / 短剧 | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/vod.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/vod.json` |
+| 全部 | 13 个源（含成人） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/manifest.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/manifest.json` |
+| 影视 | 7 个影视 / 短剧 | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/vod.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/vod.json` |
 | 成人 | 6 个成人源（`mature`） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/18.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/18.json` |
 
 推荐先订 **影视源**。成人列表需在设置里打开成人内容后再导入。GitHub Raw 若打不开，改用 jsDelivr。
@@ -44,6 +44,7 @@
 | `plugins/xingya.js` | `xingya` | 分类、搜索、详情、直链 | 星芽短剧，JWT 存 `hg.storage` |
 | `plugins/hdmoli.js` | `hdmoli` | 分类、搜索、详情、播放 | XOR 解密播放地址 |
 | `plugins/wwgz.js` | `wwgz` | 分类、搜索、详情、播放 | 农民影视 |
+| `plugins/yysub.js` | `yysub` | 首页、分类、排行、搜索、分季资源（磁力/电驴，外部 App 打开） | 人人影视 |
 | `plugins/huangguo.js` | `huangguo` | 首页、信息流、分类、搜索、详情、HLS、图文、评论 | JSON API，`mature` |
 | `plugins/madou.js` | `madou` | 分类、搜索、详情、HLS | `mature` |
 | `plugins/hkdoll.js` | `hkdoll` | 分类、搜索、详情、播放 | `mature`，XOR |
