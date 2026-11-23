@@ -15,18 +15,20 @@
     {
       "id": "hghub.ikanpp",
       "title": "影视聚合",
+      "icon": "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
       "description": "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，三站聚合搜索，多线路播放",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.23.5",
+      "version": "2026.11.23.6",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js"
     },
     {
       "id": "hghub.anime",
       "title": "动漫聚合",
+      "icon": "https://hghub-icons.hghub-zhang.workers.dev/anime.png",
       "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.23.4",
+      "version": "2026.11.23.5",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js"
     }
