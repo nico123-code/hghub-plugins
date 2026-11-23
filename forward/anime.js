@@ -13,68 +13,10 @@ WidgetMetadata = {
   "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.23.5",
+  "version": "2026.11.23.6",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
-    {
-      "id": "search_in",
-      "title": "🔍 搜索",
-      "functionName": "search",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "keyword",
-          "title": "番剧名",
-          "type": "input",
-          "value": "间谍过家家",
-          "description": "输入番名后搜索",
-          "placeholders": [
-            {
-              "title": "间谍过家家",
-              "value": "间谍过家家"
-            },
-            {
-              "title": "葬送的芙莉莲",
-              "value": "葬送的芙莉莲"
-            },
-            {
-              "title": "海贼王",
-              "value": "海贼王"
-            }
-          ]
-        },
-        {
-          "name": "site",
-          "title": "站点",
-          "type": "enumeration",
-          "value": "all",
-          "enumOptions": [
-            {
-              "title": "全部（girigiri + AGE + 稀饭）",
-              "value": "all"
-            },
-            {
-              "title": "girigiri",
-              "value": "gg"
-            },
-            {
-              "title": "AGE",
-              "value": "age"
-            },
-            {
-              "title": "稀饭",
-              "value": "xf"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
     {
       "id": "gg_week",
       "title": "girigiri·新番时间表",

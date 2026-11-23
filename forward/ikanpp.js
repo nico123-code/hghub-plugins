@@ -20,44 +20,10 @@ WidgetMetadata = {
   description: "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，三站聚合搜索，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.6",
+  version: "2026.11.23.7",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
-    {
-      id: "search_in",
-      title: "🔍 搜索",
-      functionName: "search",
-      cacheDuration: 300,
-      params: [
-        { name: "keyword", title: "关键词", type: "input", value: "繁花", description: "输入片名后搜索", placeholders: [{ title: "繁花", value: "繁花" }, { title: "庆余年", value: "庆余年" }, { title: "哪吒", value: "哪吒" }] },
-        {
-          "name": "site",
-          "title": "站点",
-          "type": "enumeration",
-          "value": "all",
-          "enumOptions": [
-            {
-              "title": "全部（爱看片片 + nnyy + 小蜜蜂）",
-              "value": "all"
-            },
-            {
-              "title": "爱看片片",
-              "value": "ik"
-            },
-            {
-              "title": "nnyy（努努影院）",
-              "value": "nn"
-            },
-            {
-              "title": "小蜜蜂影院",
-              "value": "xm"
-            }
-          ]
-        },
-        { name: "page", title: "页码", type: "page" },
-      ],
-    },
     {
       "id": "browse_movie",
       "title": "爱看片片·电影",
