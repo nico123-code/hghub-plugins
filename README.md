@@ -62,7 +62,6 @@
 | 黄果短剧 `hghub.huangguo` | `forward/huangguo.js` | 全部 / 分类（短剧、漫剧）、题材标签分类（题材、架空、男频、女频、伦理、关系、外貌、玩法、场景，共 96 个标签）、排行榜（热播 / 推荐 / 潜力）、搜索、分集列表、HLS 播放 |
 | 影视聚合 `hghub.ikanpp` | `forward/ikanpp.js` | iKanPP（www.ikanpp.com）：电影 / 剧集 / 动漫 / 综艺 / 纪录片（按类型、地区、排序筛选）、短剧（10 个分类）、搜索、选集、多线路播放（同一集列出各播放源，可切换） |
 | girigiri爱动漫 `hghub.girigiri` | `forward/girigiri.js` | ani.girigirilove.com：新番时间表（周一～周日）、日番（排序 / 年份 / 季度 / 类型 / 版本 / 来源筛选）、美番、剧场版、真人番剧、BD副音轨、演唱会·其他、搜索、选集、多线路播放（简中 / 繁中 / 杜比） |
-| tingyou `forward.tingyou` | `forward/tingyou.js` | 外部提供的 Rex 加密模块，原样收录（内容加密，未审阅） |
 
 订阅地址（在 Rex / Forward 的「模块 → 添加订阅」里粘贴）：
 
