@@ -17,10 +17,12 @@ WidgetMetadata = {
   id: "hghub.ikanpp",
   title: "影视聚合",
   icon: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
+  iconUrl: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
+  logo: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   description: "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，三站聚合搜索，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.7",
+  version: "2026.11.23.8",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [

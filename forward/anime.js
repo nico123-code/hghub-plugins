@@ -10,10 +10,12 @@ WidgetMetadata = {
   "id": "hghub.anime",
   "title": "动漫聚合",
   "icon": "https://hghub-icons.hghub-zhang.workers.dev/anime.png",
+  "iconUrl": "https://hghub-icons.hghub-zhang.workers.dev/anime.png",
+  "logo": "https://hghub-icons.hghub-zhang.workers.dev/anime.png",
   "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.23.6",
+  "version": "2026.11.23.7",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
