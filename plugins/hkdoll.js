@@ -1,7 +1,7 @@
 export const meta = {
   id: 'hkdoll',
   name: '玩偶姐姐',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: '玩偶姐姐：分类、搜索、详情与 XOR 解密播放。',
   author: 'community',
@@ -111,17 +111,32 @@ export default function (hg) {
   }
 
   async function loadTabs(ctx) {
-    const html = await fetchHtml(origin() + '/', ctx);
+    const fallback = [{ id: origin() + '/latest/', label: '最新' }];
+    let html;
+    try {
+      html = await fetchHtml(origin() + '/', ctx);
+    } catch (_) {
+      return fallback;
+    }
     const doc = hg.html.parse(html);
     const links = doc.select('.scrollbar a');
+    const host = new URL(origin()).hostname;
     const items = [];
+    const seen = {};
     for (let i = 0; i < links.length; i++) {
       const name = links[i].text().trim();
       const href = links[i].attr('href');
       if (!name || !href || name.indexOf('亚洲成人视频') >= 0) continue;
-      items.push({ id: absUrl(href), label: name });
+      let u;
+      try { u = new URL(absUrl(href)); } catch (_) { continue; }
+      // 导航里混有外站广告（如 laoshiji.net），不是本站分类
+      if (u.hostname !== host || u.pathname === '/' ) continue;
+      const id = u.toString();
+      if (seen[id]) continue;
+      seen[id] = true;
+      items.push({ id, label: name });
     }
-    return items.length ? items : [{ id: origin() + '/', label: '首页' }];
+    return items.length ? items : fallback;
   }
 
   function guessFormat(url) {

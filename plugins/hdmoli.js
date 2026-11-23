@@ -1,20 +1,21 @@
 export const meta = {
   id: 'hdmoli',
   name: 'hdmoli',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: 'hdmoli：电影、剧集、动画分类、搜索、详情与播放解析。',
   author: 'community',
   kind: 'source',
-  linkDomains: ['hdmoli.pro', 'v.damoli.pro'],
+  linkDomains: ['www.hdmoli.com', 'hdmoli.com', 'hdmoli.pro', 'v.damoli.pro'],
   defaultHeaders: {
-    Referer: 'https://hdmoli.pro/',
+    Referer: 'https://www.hdmoli.com/',
     'User-Agent': 'Mozilla/5.0 (Linux; Android 11; M2007J3SC Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 Mobile Safari/537.36',
   },
   timeouts: { read: 20, playback: 30 },
 };
 
-const SITE = 'https://hdmoli.pro';
+// hdmoli.pro 现在把所有路径 301 到 www.hdmoli.com 首页，导致三个分类内容相同。
+const SITE = 'https://www.hdmoli.com';
 const UA = 'Mozilla/5.0 (Linux; Android 11; M2007J3SC Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 Mobile Safari/537.36';
 const TABS = [
   { id: '1', label: '电影', type: 'movie' },

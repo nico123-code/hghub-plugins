@@ -1,7 +1,7 @@
 export const meta = {
   id: 'xhamster',
   name: 'xHamster',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: 'xHamster：分类、搜索、详情与多清晰度播放。',
   author: 'community',
@@ -74,7 +74,63 @@ export default function (hg) {
     return Number.isFinite(n) && n > 0 ? n : 1;
   }
 
+  // 页面只把前几张卡片渲染成带 <img alt> 的 HTML，其余是懒加载空壳；
+  // 完整列表在 window.initials 的 videoThumbProps 里。
+  function extractJsonArray(text, key) {
+    const idx = text.indexOf('"' + key + '":[');
+    if (idx < 0) return null;
+    const start = text.indexOf('[', idx);
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < text.length; i++) {
+      const ch = text.charAt(i);
+      if (inStr) {
+        if (esc) esc = false;
+        else if (ch === '\\') esc = true;
+        else if (ch === '"') inStr = false;
+        continue;
+      }
+      if (ch === '"') inStr = true;
+      else if (ch === '[' || ch === '{') depth++;
+      else if (ch === ']' || ch === '}') {
+        depth--;
+        if (depth === 0) {
+          try { return JSON.parse(text.slice(start, i + 1)); } catch (_) { return null; }
+        }
+      }
+    }
+    return null;
+  }
+
+  function fmtDuration(sec) {
+    const n = Math.floor(Number(sec) || 0);
+    if (!n) return '';
+    const m = Math.floor(n / 60), ss = n % 60;
+    return (m >= 60 ? Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0') : String(m)) + ':' + String(ss).padStart(2, '0');
+  }
+
   function parseCards(html) {
+    const rows = extractJsonArray(html, 'videoThumbProps');
+    if (rows && rows.length) {
+      const out = [];
+      const seen = {};
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r.pageURL || !r.title) continue;
+        const id = pathId(r.pageURL);
+        if (seen[id]) continue;
+        seen[id] = true;
+        const item = { id, title: String(r.title).trim(), type: 'movie' };
+        const cover = r.thumbURL || r.imageURL;
+        if (cover && /^https:\/\//.test(cover)) item.cover = cover;
+        if (r.duration) { item.durationSec = Number(r.duration); const b = fmtDuration(r.duration); if (b) item.badge = b.slice(0, 8); }
+        out.push(item);
+      }
+      if (out.length) return out;
+    }
+    return parseCardsHtml(html);
+  }
+
+  function parseCardsHtml(html) {
     const doc = hg.html.parse(html);
     const items = [];
     const nodes = doc.select('.thumb-list__item');

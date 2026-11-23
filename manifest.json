@@ -33,7 +33,7 @@
     {
       "id": "avtoday",
       "name": "avtoday",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/avtoday.js",
       "description": "avtoday：分类、搜索、详情与 HLS 播放。"
     },
@@ -47,14 +47,14 @@
     {
       "id": "hanime",
       "name": "Hanime1",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/hanime.js",
       "description": "Hanime1：分类、搜索、详情与直链播放。"
     },
     {
       "id": "hdmoli",
       "name": "hdmoli",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/hdmoli.js",
       "description": "hdmoli：电影、剧集、动画分类、搜索、详情与播放解析。"
     },
@@ -68,7 +68,7 @@
     {
       "id": "hkdoll",
       "name": "玩偶姐姐",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/hkdoll.js",
       "description": "玩偶姐姐：分类、搜索、详情与 XOR 解密播放。"
     },
@@ -96,7 +96,7 @@
     {
       "id": "madou",
       "name": "麻豆社",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/madou.js",
       "description": "麻豆社：分类、搜索、详情与 HLS 播放。"
     },
@@ -131,7 +131,7 @@
     {
       "id": "xhamster",
       "name": "xHamster",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/xhamster.js",
       "description": "xHamster：分类、搜索、详情与多清晰度播放。"
     },

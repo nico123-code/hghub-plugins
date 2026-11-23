@@ -40,7 +40,7 @@
     {
       "id": "hdmoli",
       "name": "hdmoli",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/hdmoli.js",
       "description": "hdmoli：电影、剧集、动画分类、搜索、详情与播放解析。"
     },

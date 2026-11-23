@@ -1,7 +1,7 @@
 export const meta = {
   id: 'hanime',
   name: 'Hanime1',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: 'Hanime1：分类、搜索、详情与直链播放。',
   author: 'community',
@@ -82,8 +82,19 @@ export default function (hg) {
     return items;
   }
 
+  function staticTabs() {
+    const g = ['裏番', '泡麵番', 'Motion Anime', '3DCG', '2.5D', '2D動畫', 'AI生成', 'MMD', 'Cosplay'];
+    return g.map(function (x) { return { id: origin() + '/search?genre=' + encodeURIComponent(x), label: x }; });
+  }
+
   async function loadTabs(ctx) {
-    const html = await fetchHtml(origin() + '/', ctx);
+    let html;
+    try {
+      html = await fetchHtml(origin() + '/', ctx);
+    } catch (_) {
+      // 首页被 Cloudflare 拦截时 getCategories 会整体失败，分类页直接空白
+      return staticTabs();
+    }
     const doc = hg.html.parse(html);
     const links = doc.select('#main-nav-home > a.nav-item');
     const items = [];
@@ -94,7 +105,7 @@ export default function (hg) {
       if (name.indexOf('新番預告') >= 0 || name.indexOf('H漫畫') >= 0) continue;
       items.push({ id: absUrl(href), label: name });
     }
-    return items.length ? items : [{ id: origin() + '/', label: '首页' }];
+    return items.length ? items : staticTabs();
   }
 
   function guessFormat(url) {

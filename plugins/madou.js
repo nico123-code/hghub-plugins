@@ -1,7 +1,7 @@
 export const meta = {
   id: 'madou',
   name: '麻豆社',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: '麻豆社：分类、搜索、详情与 HLS 播放。',
   author: 'community',
@@ -89,7 +89,8 @@ export default function (hg) {
     const doc = hg.html.parse(html);
     const links = doc.select('.sitenav a');
     const items = [];
-    const ignore = ['首页', '其他', '热门标签', '筛选'];
+    // 7天/30天热门页面目前恒为“暂无内容”，不作为分类展示
+    const ignore = ['首页', '其他', '热门标签', '筛选', '7天热门', '30天热门'];
     for (let i = 0; i < links.length; i++) {
       const name = links[i].text().trim();
       const href = links[i].attr('href');

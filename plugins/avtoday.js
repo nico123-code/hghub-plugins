@@ -1,7 +1,7 @@
 export const meta = {
   id: 'avtoday',
   name: 'avtoday',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: 'avtoday：分类、搜索、详情与 HLS 播放。',
   author: 'community',
@@ -17,6 +17,8 @@ export const meta = {
 
 const SITE = 'https://avtoday.io';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+// 站点按 Accept-Language 生成分类链接；不带或带 * 时会出现 /*/catalog/... 这种 404 地址。
+const STATIC_TABS = ['無碼', '絲襪', 'FC2', '多人', '長腿', '巨乳', '自慰', '素人', '足交', '潮吹', '痴女', '熟女', '制服', '人妻', '泡泡浴'];
 
 export default function (hg) {
   function origin() {
@@ -26,7 +28,7 @@ export default function (hg) {
   }
 
   function headers() {
-    return { 'User-Agent': UA, Referer: origin() + '/' };
+    return { 'User-Agent': UA, Referer: origin() + '/', 'Accept-Language': 'zh-TW,zh;q=0.9' };
   }
 
   function fail(code, message, extra) {
@@ -94,20 +96,44 @@ export default function (hg) {
     return items;
   }
 
+  function catalogUrl(name) {
+    return origin() + '/cht/catalog/' + encodeURIComponent(name) + '.html';
+  }
+
+  function staticTabs() {
+    const items = [{ id: origin() + '/catalog', label: '全部' }];
+    for (let i = 0; i < STATIC_TABS.length; i++) items.push({ id: catalogUrl(STATIC_TABS[i]), label: STATIC_TABS[i] });
+    return items;
+  }
+
   async function loadTabs(ctx) {
-    const html = await fetchHtml(origin() + '/catalog', ctx);
+    let html;
+    try {
+      html = await fetchHtml(origin() + '/catalog', ctx);
+    } catch (_) {
+      return staticTabs();
+    }
     const doc = hg.html.parse(html);
     const slides = doc.select('.swiper-wrapper > .swiper-slide');
-    const items = [];
+    const host = new URL(origin()).hostname;
+    const items = [{ id: origin() + '/catalog', label: '全部' }];
+    const seen = {};
     for (let i = 0; i < slides.length; i++) {
       const nameEl = slides[i].first('.btn-categories__title');
       const a = slides[i].first('a.btn-categories');
       const name = nameEl ? nameEl.text().trim() : '';
       const href = a && a.attr('href');
       if (!name || !href) continue;
-      items.push({ id: absUrl(href), label: name });
+      let u;
+      try { u = new URL(absUrl(href)); } catch (_) { continue; }
+      // 轮播里混有 telegram 等外链广告，只保留本站分类页
+      if (u.hostname !== host || u.pathname.indexOf('/catalog/') < 0) continue;
+      const id = u.pathname.indexOf('/*/') === 0 ? catalogUrl(name) : u.toString();
+      if (seen[id]) continue;
+      seen[id] = true;
+      items.push({ id, label: name });
     }
-    return items.length ? items : [{ id: origin() + '/catalog', label: '目录' }];
+    return items.length > 1 ? items : staticTabs();
   }
 
   return {
@@ -127,7 +153,7 @@ export default function (hg) {
       async list(params, ctx) {
         const cat = (params && params.categoryId) || origin() + '/';
         const page = pageOf(params && params.cursor);
-        let url = absUrl(cat);
+        let url = absUrl(cat).replace('/*/catalog/', '/cht/catalog/');
         if (page > 1) url += (url.indexOf('?') >= 0 ? '&' : '?') + 'page=' + page;
         const html = await fetchHtml(url, ctx);
         const items = parseCards(html);
