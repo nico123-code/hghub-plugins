@@ -62,6 +62,7 @@
 | 黄果短剧 `hghub.huangguo` | `forward/huangguo.js` | 全部 / 分类（短剧、漫剧）、题材标签分类（题材、架空、男频、女频、伦理、关系、外貌、玩法、场景，共 96 个标签）、排行榜（热播 / 推荐 / 潜力）、搜索、分集列表、HLS 播放 |
 | 影视聚合 `hghub.ikanpp` | `forward/ikanpp.js` | iKanPP（www.ikanpp.com）：电影 / 剧集 / 动漫 / 综艺 / 纪录片（按类型、地区、排序筛选）、短剧（10 个分类）、搜索、选集、多线路播放（同一集列出各播放源，可切换） |
 | girigiri爱动漫 `hghub.girigiri` | `forward/girigiri.js` | ani.girigirilove.com：新番时间表（周一～周日）、日番（排序 / 年份 / 季度 / 类型 / 版本 / 来源筛选）、美番、剧场版、真人番剧、BD副音轨、演唱会·其他、搜索、选集、多线路播放（简中 / 繁中 / 杜比） |
+| 动漫聚合 `hghub.anime` | `forward/anime.js` | 聚合 3 个动漫站：girigiri爱动漫（新番时间表、日番 / 美番 / 剧场版 / 真人 / BD副音轨 / 其他，带筛选）、AGE动漫（最近更新、番剧目录：版本 / 地区 / 年份 / 季度 / 类型 / 状态 / 排序）、MuteFun（追番周表、今日更新、日漫 / 美漫 / 特摄 / 日剧）；搜索可选全部或单站（girigiri、AGE；MuteFun 站内搜索有人机验证，不支持）；选集、多线路播放 |
 
 订阅地址（在 Rex / Forward 的「模块 → 添加订阅」里粘贴）：
 
@@ -69,7 +70,7 @@
 https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/hghub.fwd
 ```
 
-也可以只导入单个模块：`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/girigiri.js`
+也可以只导入单个模块：`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/girigiri.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js`
 
 封面：黄果的封面图是 AES 加密的，Rex / Forward 不能解码，默认不显示封面。想要封面的话，把 `forward/cover-proxy-worker.js` 部署成 Cloudflare Worker，再在模块全局参数「封面解密代理」里填 `https://<你的子域>.workers.dev/?url=`。
 
