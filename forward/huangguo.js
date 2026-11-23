@@ -12,10 +12,13 @@
 WidgetMetadata = {
   id: "hghub.huangguo",
   title: "黄果短剧",
+  icon: "https://hghub-hg.hghub-zhang.workers.dev/huangguo.png",
+  iconUrl: "https://hghub-hg.hghub-zhang.workers.dev/huangguo.png",
+  logo: "https://hghub-hg.hghub-zhang.workers.dev/huangguo.png",
   description: "黄果短剧：分类、题材标签、榜单、搜索、分集播放（18+）",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.5",
+  version: "2026.11.23.6",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   globalParams: [
