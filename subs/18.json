@@ -5,42 +5,42 @@
     {
       "id": "avtoday",
       "name": "avtoday",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "url": "plugins/avtoday.js",
       "description": "avtoday：分类、搜索、详情与 HLS 播放。"
     },
     {
       "id": "hkdoll",
       "name": "玩偶姐姐",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "url": "plugins/hkdoll.js",
       "description": "玩偶姐姐：分类、搜索、详情与 XOR 解密播放。"
     },
     {
       "id": "huangguo",
       "name": "黄果短剧",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "url": "plugins/huangguo.js",
       "description": "黄果短剧站点源：首页、分类、搜索、详情、HLS 播放与图文。封面走站点公开的 AES-CBC 图片协议。"
     },
     {
       "id": "madou",
       "name": "麻豆社",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "url": "plugins/madou.js",
       "description": "麻豆社：分类、搜索、详情与 HLS 播放。"
     },
     {
       "id": "pornhub",
       "name": "Pornhub",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/pornhub.js",
       "description": "Pornhub：分类、搜索、详情与 HLS 播放。"
     },
     {
       "id": "xhamster",
       "name": "xHamster",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "url": "plugins/xhamster.js",
       "description": "xHamster：分类、搜索、详情与多清晰度播放。"
     }

@@ -1,7 +1,7 @@
 export const meta = {
   id: 'madou',
   name: '麻豆社',
-  version: '1.0.2',
+  version: '1.0.3',
   protocol: 1,
   description: '麻豆社：分类、搜索、详情与 HLS 播放。',
   author: 'community',
@@ -18,6 +18,9 @@ export const meta = {
 const SITE = 'https://madou.club';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
+// 列表/详情页短缓存：重复进入首页、分类、返回上一页时不再重新请求；播放解析始终取最新。
+const PAGE_CACHE = { ttlSec: 300, staleIfErrorSec: 3600 };
+
 export default function (hg) {
   function origin() {
     const cur = hg.endpoint && hg.endpoint.current;
@@ -33,8 +36,8 @@ export default function (hg) {
     throw new hg.PluginError(code, message, extra);
   }
 
-  async function fetchHtml(url, ctx) {
-    const res = await hg.http.fetch({
+  async function fetchHtml(url, ctx, fresh) {
+    const req = {
       url,
       headers: headers(),
       responseType: 'text',
@@ -42,7 +45,9 @@ export default function (hg) {
       retry: 1,
       maxBytes: 8 * 1024 * 1024,
       signal: ctx && ctx.signal,
-    });
+    };
+    if (!fresh) req.cache = PAGE_CACHE;
+    const res = await hg.http.fetch(req);
     if (!res.ok) fail('UPSTREAM_ERROR', '页面暂时不可用（HTTP ' + res.status + '）');
     return res.data;
   }
@@ -164,13 +169,13 @@ export default function (hg) {
       async resolvePlayback(params, ctx) {
         const episodeId = params && params.episodeId;
         if (!episodeId) fail('INVALID_ARGUMENT', '缺少分集 ID');
-        const html = await fetchHtml(absUrl(episodeId), ctx);
+        const html = await fetchHtml(absUrl(episodeId), ctx, true);
         const doc = hg.html.parse(html);
         const iframe = doc.first('.article-content iframe') || doc.first('iframe');
         const src = iframe && iframe.attr('src');
         if (!src) fail('UPSTREAM_CHANGED', '未找到播放框');
         const dash = (absUrl(src).match(/^(https?:\/\/[^/]+)/) || [])[1];
-        const dashHtml = await fetchHtml(absUrl(src), ctx);
+        const dashHtml = await fetchHtml(absUrl(src), ctx, true);
         const token = (dashHtml.match(/var token = "(.+)";/) || [])[1];
         const m3u8 = (dashHtml.match(/var m3u8 = '(.+)';/) || [])[1];
         if (!dash || !token || !m3u8) fail('UPSTREAM_CHANGED', '未解析到播放地址');

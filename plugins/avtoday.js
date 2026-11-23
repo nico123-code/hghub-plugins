@@ -1,7 +1,7 @@
 export const meta = {
   id: 'avtoday',
   name: 'avtoday',
-  version: '1.0.2',
+  version: '1.0.3',
   protocol: 1,
   description: 'avtoday：分类、搜索、详情与 HLS 播放。',
   author: 'community',
@@ -20,6 +20,9 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 // 站点按 Accept-Language 生成分类链接；不带或带 * 时会出现 /*/catalog/... 这种 404 地址。
 const STATIC_TABS = ['無碼', '絲襪', 'FC2', '多人', '長腿', '巨乳', '自慰', '素人', '足交', '潮吹', '痴女', '熟女', '制服', '人妻', '泡泡浴'];
 
+// 列表/详情页短缓存：重复进入首页、分类、返回上一页时不再重新请求；播放解析始终取最新。
+const PAGE_CACHE = { ttlSec: 300, staleIfErrorSec: 3600 };
+
 export default function (hg) {
   function origin() {
     const cur = hg.endpoint && hg.endpoint.current;
@@ -35,8 +38,8 @@ export default function (hg) {
     throw new hg.PluginError(code, message, extra);
   }
 
-  async function fetchHtml(url, ctx, extra) {
-    const res = await hg.http.fetch({
+  async function fetchHtml(url, ctx, extra, fresh) {
+    const req = {
       url,
       headers: Object.assign(headers(), extra || {}),
       responseType: 'text',
@@ -44,7 +47,9 @@ export default function (hg) {
       retry: 1,
       maxBytes: 8 * 1024 * 1024,
       signal: ctx && ctx.signal,
-    });
+    };
+    if (!fresh) req.cache = PAGE_CACHE;
+    const res = await hg.http.fetch(req);
     if (!res.ok) fail('UPSTREAM_ERROR', '页面暂时不可用（HTTP ' + res.status + '）');
     return res.data;
   }
@@ -200,7 +205,7 @@ export default function (hg) {
         const code = (pageUrl.split('/video/')[1] || '').replace(/\/$/, '');
         if (!code) fail('INVALID_ARGUMENT', '作品编号无效');
         const playerUrl = origin() + '/player?s=' + encodeURIComponent(code);
-        const html = await fetchHtml(playerUrl, ctx, { Referer: pageUrl });
+        const html = await fetchHtml(playerUrl, ctx, { Referer: pageUrl }, true);
         const m = html.match(/m3u8_url\s+=\s+'(.+)'/);
         if (!m) fail('UPSTREAM_CHANGED', '未解析到播放地址');
         return {

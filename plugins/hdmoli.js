@@ -1,7 +1,7 @@
 export const meta = {
   id: 'hdmoli',
   name: 'hdmoli',
-  version: '1.0.2',
+  version: '1.0.3',
   protocol: 1,
   description: 'hdmoli：电影、剧集、动画分类、搜索、详情与播放解析。',
   author: 'community',
@@ -23,6 +23,9 @@ const TABS = [
   { id: '41', label: '动画', type: 'anime' },
 ];
 
+// 列表/详情页短缓存：重复进入首页、分类、返回上一页时不再重新请求；播放解析始终取最新。
+const PAGE_CACHE = { ttlSec: 300, staleIfErrorSec: 3600 };
+
 export default function (hg) {
   function origin() {
     const cur = hg.endpoint && hg.endpoint.current;
@@ -38,8 +41,8 @@ export default function (hg) {
     throw new hg.PluginError(code, message, extra);
   }
 
-  async function fetchHtml(url, ctx) {
-    const res = await hg.http.fetch({
+  async function fetchHtml(url, ctx, fresh) {
+    const req = {
       url,
       headers: headers(),
       responseType: 'text',
@@ -47,7 +50,9 @@ export default function (hg) {
       retry: 1,
       maxBytes: 8 * 1024 * 1024,
       signal: ctx && ctx.signal,
-    });
+    };
+    if (!fresh) req.cache = PAGE_CACHE;
+    const res = await hg.http.fetch(req);
     if (!res.ok) fail('UPSTREAM_ERROR', '页面暂时不可用（HTTP ' + res.status + '）');
     return res.data;
   }
@@ -97,7 +102,10 @@ export default function (hg) {
       const href = a.attr('href');
       const title = a.attr('title') || a.text();
       if (!href || !title) continue;
-      const cover = a.attr('data-original') || a.attr('src');
+      // 站点改版后封面放在缩略图链接里的 <img class="vod-poster" src=...>，旧写法读不到。
+      const img = a.first('img') || nodes[i].first('img');
+      const cover = a.attr('data-original') ||
+        (img && (img.attr('data-original') || img.attr('data-src') || img.attr('src')));
       const item = { id: pathId(href), title: title.trim(), type: typeHint || 'other' };
       if (cover) item.cover = absUrl(cover);
       items.push(item);
@@ -187,18 +195,22 @@ export default function (hg) {
           if (episodes.length) playlists.push({ id: String(i + 1), label: '线路' + (i + 1), episodes });
         }
         if (!playlists.length) fail('UPSTREAM_CHANGED', '未解析到分集');
-        return {
+        const detail = {
           id: pathId(id),
           title,
           type: playlists[0].episodes.length > 1 ? 'series' : 'movie',
           playlists,
         };
+        const poster = doc.first('.myui-content__thumb img');
+        const cover = poster && (poster.attr('data-original') || poster.attr('src'));
+        if (cover) detail.cover = absUrl(cover);
+        return detail;
       },
 
       async resolvePlayback(params, ctx) {
         const episodeId = params && params.episodeId;
         if (!episodeId) fail('INVALID_ARGUMENT', '缺少分集 ID');
-        const html = await fetchHtml(absUrl(episodeId), ctx);
+        const html = await fetchHtml(absUrl(episodeId), ctx, true);
         const m = html.match(/var now="([^"]+)"/);
         if (!m) fail('UPSTREAM_CHANGED', '未找到播放变量');
         const encUrl = m[1].split('|')[0];

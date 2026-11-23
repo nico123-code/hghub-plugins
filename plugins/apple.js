@@ -1,7 +1,7 @@
 export const meta = {
   id: 'apple',
   name: '小苹果',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: '小苹果影视 App 接口：分类、搜索、详情与 HLS 播放。上游为 HTTP。',
   author: 'community',
@@ -22,6 +22,9 @@ const TABS = [
   { id: '3', label: '综艺', type: 'variety' },
   { id: '4', label: '动漫', type: 'anime' },
 ];
+
+// 列表/详情短缓存：重复进入首页、分类时不再重新请求。
+const PAGE_CACHE = { ttlSec: 300, staleIfErrorSec: 3600 };
 
 export default function (hg) {
   function origin() {
@@ -46,6 +49,7 @@ export default function (hg) {
       responseType: 'json',
       timeoutMs: 15000,
       retry: 1,
+      cache: PAGE_CACHE,
       signal: ctx && ctx.signal,
     });
     if (!res.ok) fail('UPSTREAM_ERROR', (label || '接口') + '暂时不可用（HTTP ' + res.status + '）');

@@ -1,7 +1,7 @@
 export const meta = {
   id: 'huangguo',
   name: '黄果短剧',
-  version: '1.0.0',
+  version: '1.0.1',
   protocol: 1,
   description: '黄果短剧站点源：首页、分类、搜索、详情、HLS 播放与图文。封面走站点公开的 AES-CBC 图片协议。',
   author: 'community',
@@ -27,6 +27,9 @@ const IMG_HOSTS = {
   'pic.eanfog.cn': true,
   'pic.zdmhyg.cn': true,
   'pic.tuafjz.cn': true,
+  // 上游 2026-11-23 起把封面迁到 pic.qnlycc.cn（/api/videos 前 20 条全是该域名），
+  // 不加进白名单就不会走 AES 解密，宿主直接把密文当图片下发，封面全黑/加载不出。
+  'pic.qnlycc.cn': true,
 };
 const STATIC_CATES = [
   { id: '24', label: 'AI短剧', route: 'ai-duanju' },
@@ -87,6 +90,8 @@ export default function (hg) {
       responseType: 'json',
       timeoutMs: 15000,
       retry: 1,
+      // 封面地址带约 30–60 分钟有效的 auth_key，缓存只留 5 分钟，避免拿到过期封面。
+      cache: { ttlSec: 300 },
       signal: ctx && ctx.signal,
     });
     return asData(res, label || path);
@@ -142,7 +147,9 @@ export default function (hg) {
     const href = String(url);
     let host = '';
     try { host = new URL(href).hostname; } catch (_) { return href; }
-    if (!IMG_HOSTS[host]) return href;
+    // 上游会不定期换图床域名（pic.xxx.cn），白名单跟不上就会整片封面加载不出。
+    // 站点自己的接口图片都是 AES 加密的，按 pic.* 前缀或 auth_key 签名统一识别。
+    if (!IMG_HOSTS[host] && host.indexOf('pic.') !== 0 && href.indexOf('auth_key=') < 0) return href;
     return {
       url: href,
       transform: { type: 'aes-cbc', key: COVER_KEY_B64, iv: COVER_IV_B64, padding: 'none' },
@@ -358,13 +365,18 @@ export default function (hg) {
 
     home: {
       async getSections(params, ctx) {
-        const cats = await loadCates(ctx);
-        const latest = await listVideos(undefined, '1', ctx, '首页');
-        let hotItems = [];
-        try {
-          const ranks = await getJson('/api/ranks/hot', undefined, ctx, '热播榜');
-          hotItems = mapVideos(ranks).slice(0, 20);
-        } catch (_) {}
+        // 原来是 7 次串行请求（分类 + 最新 + 热播榜 + 4 个分类各 1 次），
+        // 首页要等最慢的一次走完才出内容；改成并行，只等最慢的一次。
+        const [cats, latest, hotItems] = await Promise.all([
+          loadCates(ctx),
+          listVideos(undefined, '1', ctx, '首页'),
+          (async function () {
+            try {
+              const ranks = await getJson('/api/ranks/hot', undefined, ctx, '热播榜');
+              return mapVideos(ranks).slice(0, 20);
+            } catch (_) { return []; }
+          })(),
+        ]);
         const bannerItems = latest.items.slice(0, 6).map(function (it) {
           const copy = Object.assign({}, it);
           if (!copy.backdrop && copy.cover) copy.backdrop = copy.cover;
@@ -385,21 +397,23 @@ export default function (hg) {
           items: latest.items,
           more: true,
         });
-        for (let i = 0; i < cats.length; i++) {
-          const cat = cats[i];
-          try {
-            const page = await listVideos({ cate_id: cat.id }, '1', ctx, cat.label);
-            if (page.items.length) {
-              sections.push({
+        const cateSections = await Promise.all(cats.map(function (cat) {
+          return listVideos({ cate_id: cat.id }, '1', ctx, cat.label)
+            .then(function (page) {
+              if (!page.items.length) return null;
+              return {
                 id: 'cate-' + cat.id,
                 title: cat.label,
                 layout: 'row',
                 imageAspect: 'portrait',
                 items: page.items,
                 more: true,
-              });
-            }
-          } catch (_) {}
+              };
+            })
+            .catch(function () { return null; });
+        }));
+        for (let i = 0; i < cateSections.length; i++) {
+          if (cateSections[i]) sections.push(cateSections[i]);
         }
         return { items: sections, next: null };
       },

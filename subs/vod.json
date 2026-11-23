@@ -5,21 +5,21 @@
     {
       "id": "apple",
       "name": "小苹果",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/apple.js",
       "description": "小苹果影视 App 接口：分类、搜索、详情与 HLS 播放。上游为 HTTP。"
     },
     {
       "id": "hdmoli",
       "name": "hdmoli",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "url": "plugins/hdmoli.js",
       "description": "hdmoli：电影、剧集、动画分类、搜索、详情与播放解析。"
     },
     {
       "id": "hjkk",
       "name": "韩剧看看",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/hjkk.js",
       "description": "韩剧看看：韩剧、韩影、韩综分类、搜索、详情与播放解析。"
     },
@@ -33,7 +33,7 @@
     {
       "id": "wwgz",
       "name": "农民影视",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "url": "plugins/wwgz.js",
       "description": "农民影视：分类、搜索、多线路详情与 nmvod 播放解析。"
     },

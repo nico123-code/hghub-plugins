@@ -1,7 +1,7 @@
 export const meta = {
   id: 'hjkk',
   name: '韩剧看看',
-  version: '1.0.1',
+  version: '1.0.2',
   protocol: 1,
   description: '韩剧看看：韩剧、韩影、韩综分类、搜索、详情与播放解析。',
   author: 'community',
@@ -23,6 +23,9 @@ const TABS = [
 ];
 const LIST_TPL = '/xvs{id}xatxbtxctxdtxetxftxgtxht{page}atbtct.html';
 
+// 列表/详情页短缓存：重复进入首页、分类、返回上一页时不再重新请求；播放解析始终取最新。
+const PAGE_CACHE = { ttlSec: 300, staleIfErrorSec: 3600 };
+
 export default function (hg) {
   function origin() {
     const cur = hg.endpoint && hg.endpoint.current;
@@ -38,8 +41,8 @@ export default function (hg) {
     throw new hg.PluginError(code, message, extra);
   }
 
-  async function fetchHtml(url, ctx) {
-    const res = await hg.http.fetch({
+  async function fetchHtml(url, ctx, fresh) {
+    const req = {
       url,
       headers: headers(),
       responseType: 'text',
@@ -47,7 +50,9 @@ export default function (hg) {
       retry: 1,
       maxBytes: 8 * 1024 * 1024,
       signal: ctx && ctx.signal,
-    });
+    };
+    if (!fresh) req.cache = PAGE_CACHE;
+    const res = await hg.http.fetch(req);
     if (!res.ok) fail('UPSTREAM_ERROR', '页面暂时不可用（HTTP ' + res.status + '）');
     return res.data;
   }
@@ -226,7 +231,7 @@ export default function (hg) {
       async resolvePlayback(params, ctx) {
         const episodeId = params && params.episodeId;
         if (!episodeId) fail('INVALID_ARGUMENT', '缺少分集 ID');
-        const html = await fetchHtml(absUrl(episodeId), ctx);
+        const html = await fetchHtml(absUrl(episodeId), ctx, true);
         const cfg = parsePlayer(html);
         const playUrl = decodePlayUrl(cfg);
         if (!playUrl) fail('UPSTREAM_CHANGED', '未解析到播放地址');
