@@ -10,13 +10,6 @@
       "description": "avtoday：分类、搜索、详情与 HLS 播放。"
     },
     {
-      "id": "hanime",
-      "name": "Hanime1",
-      "version": "1.0.2",
-      "url": "plugins/hanime.js",
-      "description": "Hanime1：分类、搜索、详情与直链播放。"
-    },
-    {
       "id": "hkdoll",
       "name": "玩偶姐姐",
       "version": "1.0.2",

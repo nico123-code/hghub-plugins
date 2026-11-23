@@ -12,9 +12,9 @@
 
 | 列表 | 内容 | GitHub Raw | jsDelivr |
 | --- | --- | --- | --- |
-| 全部 | 21 个源（含成人） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/manifest.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/manifest.json` |
-| 影视 | 14 个影视 / 动漫 / 短剧 | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/vod.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/vod.json` |
-| 成人 | 7 个成人源（`mature`） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/18.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/18.json` |
+| 全部 | 12 个源（含成人） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/manifest.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/manifest.json` |
+| 影视 | 6 个影视 / 短剧 | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/vod.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/vod.json` |
+| 成人 | 6 个成人源（`mature`） | `https://raw.githubusercontent.com/CoderL98/hghub-plugins/main/subs/18.json` | `https://cdn.jsdelivr.net/gh/CoderL98/hghub-plugins@main/subs/18.json` |
 
 推荐先订 **影视源**。成人列表需在设置里打开成人内容后再导入。GitHub Raw 若打不开，改用 jsDelivr。
 
@@ -38,24 +38,15 @@
 
 | 文件 | ID | 能力 | 备注 |
 | --- | --- | --- | --- |
-| `plugins/4kav.js` | `4kav` | 首页、分类、搜索、详情、直链 | 4kmp |
 | `plugins/hjkk.js` | `hjkk` | 分类、搜索、详情、播放 | 韩剧看看 |
 | `plugins/jpyy.js` | `jpyy` | 分类、搜索、详情、播放 | 金牌影视，MD5+SHA1 签名 |
-| `plugins/saohuo.js` | `saohuo` | 分类、搜索、详情、播放 | 烧火电影 |
 | `plugins/apple.js` | `apple` | 分类、搜索、详情、HLS | 小苹果，`allowInsecureHttp` |
 | `plugins/xingya.js` | `xingya` | 分类、搜索、详情、直链 | 星芽短剧，JWT 存 `hg.storage` |
-| `plugins/anfuns.js` | `anfuns` | 分类、搜索、详情、播放 | 动漫 |
-| `plugins/duanjutt.js` | `duanjutt` | 分类、详情、播放 | 搜索页有验证码，未接搜索 |
-| `plugins/tiantian.js` | `tiantian` | 分类、搜索、详情、播放 | 天天影视，`allowInsecureHttp` |
 | `plugins/hdmoli.js` | `hdmoli` | 分类、搜索、详情、播放 | XOR 解密播放地址 |
-| `plugins/aowu.js` | `aowu` | 分类、搜索、详情、播放 | DS 接口 + AES |
-| `plugins/xiaohys.js` | `xiaohys` | 分类、搜索、详情、播放 | DS 接口 + AES |
-| `plugins/jdys.js` | `jdys` | 分类、搜索、详情、播放 | AES 播放配置 |
 | `plugins/wwgz.js` | `wwgz` | 分类、搜索、详情、播放 | 农民影视 |
 | `plugins/huangguo.js` | `huangguo` | 首页、信息流、分类、搜索、详情、HLS、图文、评论 | JSON API，`mature` |
 | `plugins/madou.js` | `madou` | 分类、搜索、详情、HLS | `mature` |
 | `plugins/hkdoll.js` | `hkdoll` | 分类、搜索、详情、播放 | `mature`，XOR |
-| `plugins/hanime.js` | `hanime` | 分类、搜索、详情、直链 | `mature` |
 | `plugins/avtoday.js` | `avtoday` | 分类、搜索、详情、HLS | `mature` |
 | `plugins/xhamster.js` | `xhamster` | 分类、搜索、详情、多清晰度 | `mature` |
 | `plugins/pornhub.js` | `pornhub` | 分类、搜索、详情、HLS | `mature` |
