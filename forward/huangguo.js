@@ -15,7 +15,7 @@ WidgetMetadata = {
   description: "黄果短剧：分类、题材标签、榜单、搜索、分集播放（18+）",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.3",
+  version: "2026.11.23.4",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   globalParams: [
@@ -34,7 +34,7 @@ WidgetMetadata = {
       functionName: "search",
       cacheDuration: 300,
       params: [
-        { name: "keyword", title: "关键词", type: "input", description: "剧名 / 标签" },
+        { name: "keyword", title: "关键词", type: "input", value: "总裁", description: "剧名 / 标签", placeholders: [{ title: "总裁", value: "总裁" }, { title: "重生", value: "重生" }, { title: "战神", value: "战神" }] },
         { name: "page", title: "页码", type: "page" },
       ],
     },

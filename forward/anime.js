@@ -12,7 +12,7 @@ WidgetMetadata = {
   "description": "动漫聚合：girigiri（新番时间表/分类）、AGE（最近更新/目录筛选）、稀饭（最近更新/时间表/目录筛选），三站聚合搜索，多线路播放",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.23.3",
+  "version": "2026.11.23.4",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -26,7 +26,22 @@ WidgetMetadata = {
           "name": "keyword",
           "title": "番剧名",
           "type": "input",
-          "value": ""
+          "value": "间谍过家家",
+          "description": "输入番名后搜索",
+          "placeholders": [
+            {
+              "title": "间谍过家家",
+              "value": "间谍过家家"
+            },
+            {
+              "title": "葬送的芙莉莲",
+              "value": "葬送的芙莉莲"
+            },
+            {
+              "title": "海贼王",
+              "value": "海贼王"
+            }
+          ]
         },
         {
           "name": "site",
