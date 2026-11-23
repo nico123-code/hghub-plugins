@@ -20,6 +20,15 @@
       "version": "2026.11.23.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js"
+    },
+    {
+      "id": "hghub.girigiri",
+      "title": "girigiri爱动漫",
+      "description": "girigiri爱动漫：新番时间表、日番（年份/季度/类型/版本筛选）、美番、剧场版、真人番剧、BD副音轨，简中/繁中多线路",
+      "requiredVersion": "0.0.2",
+      "version": "2026.11.23.1",
+      "author": "nico123-code",
+      "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/girigiri.js"
     }
   ]
 }
