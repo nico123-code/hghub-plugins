@@ -15,7 +15,7 @@ WidgetMetadata = {
   description: "黄果短剧：分类、题材标签、榜单、搜索、分集播放（18+）",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.2",
+  version: "2026.11.23.3",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   globalParams: [
@@ -28,6 +28,16 @@ WidgetMetadata = {
     },
   ],
   modules: [
+    {
+      id: "search_in",
+      title: "🔍 搜索",
+      functionName: "search",
+      cacheDuration: 300,
+      params: [
+        { name: "keyword", title: "关键词", type: "input", description: "剧名 / 标签" },
+        { name: "page", title: "页码", type: "page" },
+      ],
+    },
     {
       id: "loadList",
       title: "全部短剧",

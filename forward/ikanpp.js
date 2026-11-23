@@ -16,10 +16,20 @@ WidgetMetadata = {
   description: "影视聚合：电影、剧集、动漫、综艺、纪录片、短剧，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.2",
+  version: "2026.11.23.3",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
+    {
+      id: "search_in",
+      title: "🔍 搜索",
+      functionName: "search",
+      cacheDuration: 300,
+      params: [
+        { name: "keyword", title: "关键词", type: "input", value: "" },
+        { name: "page", title: "页码", type: "page" },
+      ],
+    },
     {
       "id": "browse_movie",
       "title": "电影",
