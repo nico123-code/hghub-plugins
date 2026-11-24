@@ -7,16 +7,40 @@
 WidgetMetadata = {
   id: "hghub.insav",
   title: "Insav",
-  description: "Insav（insav.tv）免费放送：主站 / 无码 / 4K 三个分站，在线播放（18+）",
+  description: "Insav（insav.tv）免费放送（主站 / 无码 / 4K）+ MissAV（missav.ws）分类与搜索，在线播放（18+）",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.24.2",
+  version: "2026.11.24.3",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
     { id: "ins_free_1", title: "免费·主站", functionName: "loadFree1", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
     { id: "ins_free_2", title: "免费·无码", functionName: "loadFree2", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
     { id: "ins_free_4", title: "免费·4K", functionName: "loadFree4", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
+    {
+      id: "mav_list",
+      title: "MissAV",
+      functionName: "loadMav",
+      cacheDuration: 300,
+      params: [
+        {
+          name: "cat",
+          title: "分类",
+          type: "enumeration",
+          value: "new",
+          enumOptions: [
+            { title: "最近更新", value: "new" },
+            { title: "新作上市", value: "release" },
+            { title: "中文字幕", value: "chinese-subtitle" },
+            { title: "无码流出", value: "uncensored-leak" },
+            { title: "今日热门", value: "today-hot" },
+            { title: "本周热门", value: "weekly-hot" },
+            { title: "本月热门", value: "monthly-hot" },
+          ],
+        },
+        { name: "page", title: "页码", type: "page" },
+      ],
+    },
     {
       id: "loadResource",
       title: "加载资源",
@@ -30,7 +54,18 @@ WidgetMetadata = {
     title: "搜索",
     functionName: "search",
     params: [
-      { name: "keyword", title: "关键词", type: "input", description: "番号 / 标题 / 女优（只显示免费片）" },
+      { name: "keyword", title: "关键词", type: "input", description: "番号 / 标题 / 女优（Insav 只显示免费片）" },
+      {
+        name: "site",
+        title: "站点",
+        type: "enumeration",
+        value: "all",
+        enumOptions: [
+          { title: "全部（Insav + MissAV）", value: "all" },
+          { title: "Insav", value: "ins" },
+          { title: "MissAV", value: "mav" },
+        ],
+      },
       { name: "page", title: "页码", type: "page" },
     ],
   },
@@ -134,9 +169,15 @@ async function search(params) {
   var kw = String(params.keyword || params.query || "").trim();
   if (!kw) return [];
   var page = insPage(params);
-  var jobs = ["1", "2", "4"].map(function (s) {
+  var site = params.site || "all";
+  var jobs = [];
+  if (site === "all" || site === "ins") jobs = ["1", "2", "4"].map(function (s) {
     return insList(s, { page: page, limit: 30, keyword: kw }).catch(function () { return []; });
   });
+  if (site === "all" || site === "mav") jobs.push(mavSearch(kw, page).catch(function (e) {
+    if (site === "mav") throw e;
+    return [];
+  }));
   var rs = await Promise.all(jobs);
   return [].concat.apply([], rs);
 }
@@ -155,6 +196,7 @@ async function insPlay(ref) {
 }
 
 async function loadDetail(link) {
+  if (/^mav:/.test(String(link || ""))) return (await mavDetail(String(link).slice(4))).item;
   var ref = insRef(link);
   if (!ref) return null;
   var info = await insApi("video/info", { vid: ref.vid }, ref.site);
@@ -172,8 +214,195 @@ async function loadDetail(link) {
 
 async function loadResource(params) {
   params = params || {};
-  var ref = insRef(params.link || params.id);
+  var lk = String(params.link || params.id || "");
+  if (/^mav:/.test(lk)) {
+    var d = await mavDetail(lk.slice(4));
+    if (!d.playlist) throw new Error("MissAV：没找到播放地址");
+    return [{ name: "MissAV", description: "HLS", url: d.playlist, customHeaders: mavHeaders(), playerType: "app" }];
+  }
+  var ref = insRef(lk);
   if (!ref) return [];
   var r = await insPlay(ref);
   return [{ name: "Insav " + INS_SITES[ref.site], description: "HLS", url: r.url, playerType: "app" }];
+}
+
+// ===================== MissAV（missav.ws）=====================
+// 站点有 Cloudflare：若手机网络被要求“验证您是真人”，这里的请求会失败。
+// missav.ws 若被 Cloudflare 拦，自动换官方镜像 missav.fans / missav.media（同一站点）
+var MAV_ORIGINS = ["https://missav.ws", "https://missav.fans", "https://missav.media"];
+var MAV_ORIGIN = MAV_ORIGINS[0];
+var MAV_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+var MAV_CATS = [
+  ["new", "最近更新"], ["release", "新作上市"], ["chinese-subtitle", "中文字幕"], ["uncensored-leak", "无码流出"],
+  ["today-hot", "今日热门"], ["weekly-hot", "本周热门"], ["monthly-hot", "本月热门"],
+];
+var MAV_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+async function mavGetOne(origin, path) {
+  var res = await Widget.http.get(origin + path, {
+    headers: { "User-Agent": MAV_UA, Referer: origin + "/", "Accept-Language": "zh-CN,zh;q=0.9" },
+  });
+  var html = res && res.data;
+  if (typeof html !== "string") html = html == null ? "" : String(html);
+  if (/<title>\s*(Just a moment|请稍候|請稍候)/i.test(html) || (/challenge-platform/.test(html) && html.length < 20000))
+    throw new Error("Cloudflare 验证");
+  if (res && res.statusCode >= 400) throw new Error("HTTP " + res.statusCode);
+  if (html.length < 2000) throw new Error("页面为空");
+  return html;
+}
+
+async function mavGet(path) {
+  var order = [MAV_ORIGIN].concat(MAV_ORIGINS.filter(function (o) { return o !== MAV_ORIGIN; }));
+  var last;
+  for (var i = 0; i < order.length; i++) {
+    try {
+      var html = await mavGetOne(order[i], path);
+      MAV_ORIGIN = order[i];
+      return html;
+    } catch (e) { last = e; }
+  }
+  throw new Error("MissAV 打不开（" + (last && last.message || "未知错误") + "）");
+}
+
+function mavText(s) {
+  return String(s || "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;/g, "'")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+}
+
+var MAV_SKIP = /^(new|release|chinese-subtitle|uncensored-leak|english-subtitle|today-hot|weekly-hot|monthly-hot|genres?|actresses|makers?|labels?|series|search|tags?|vr|siro|luxu|gana|maan|scute|ara|fc2|heyzo|tokyohot|1pondo|caribbeancom|caribbeancompr|10musume|pacopacomama|gachinco|xxxav|marriedslash|naughty4610|naughty0930|madou|twav|furuke|saved|vip|login|register|playlists?|settings|account|contact|dmca|terms|upload|klive|clive)$/i;
+
+function mavSlugFromHref(href) {
+  var m = /^(?:https?:\/\/[^/]+)?\/(?:dm\d+\/)?(?:cn|zh|en|ja|ko|tw)\/([^/?#"']+)\/?(?:[?#].*)?$/i.exec(String(href || ""));
+  if (!m) return "";
+  var slug = decodeURIComponent(m[1]).toLowerCase();
+  if (MAV_SKIP.test(slug) || !/\d/.test(slug)) return "";
+  return slug;
+}
+
+function mavItem(slug, title, cover, dur) {
+  var link = "mav:" + slug;
+  var it = {
+    id: link, type: "url", title: title || slug.toUpperCase(), mediaType: "movie", link: link,
+    description: "MissAV",
+  };
+  var c = cover || "https://fourhoi.com/" + slug.replace(/-(chinese-subtitle|uncensored-leak|english-subtitle)$/, "") + "/cover-t.jpg";
+  it.posterPath = c; it.coverUrl = c; it.backdropPath = c.replace(/cover-t\.jpg$/, "cover-n.jpg");
+  if (dur) it.durationText = dur;
+  return it;
+}
+
+function mavParseList(html) {
+  var out = [], seen = {};
+  var blocks = html.split(/<div[^>]+class="[^"]*\bthumbnail\b/);
+  for (var i = 1; i < blocks.length; i++) {
+    var b = blocks[i];
+    var hrefs = b.match(/href="([^"]+)"/g) || [];
+    var slug = "";
+    for (var h = 0; h < hrefs.length && !slug; h++) slug = mavSlugFromHref(hrefs[h].slice(6, -1));
+    if (!slug || seen[slug]) continue;
+    seen[slug] = 1;
+    var cover = (/(?:data-src|src)="(https?:\/\/[^"]*(?:fourhoi|surrit|nineyu)[^"]*\.(?:jpe?g|webp|png))"/i.exec(b) || [])[1] || "";
+    var title = "";
+    var ta = /<a[^>]+class="[^"]*text-secondary[^"]*"[^>]*>([\s\S]*?)<\/a>/i.exec(b);
+    if (ta) title = mavText(ta[1]);
+    if (!title) { var alt = /<img[^>]+alt="([^"]{6,})"/i.exec(b); if (alt) title = mavText(alt[1]); }
+    var dur = (/>\s*(\d{1,2}:\d{2}:\d{2}|\d{1,2}:\d{2})\s*</.exec(b) || [])[1] || "";
+    out.push(mavItem(slug, title, cover, dur));
+  }
+  if (!out.length) { // 结构变了时的兜底：只按链接取
+    var re = /href="([^"]+)"/g, m;
+    while ((m = re.exec(html))) {
+      var s = mavSlugFromHref(m[1]);
+      if (s && !seen[s]) { seen[s] = 1; out.push(mavItem(s, "", "", "")); }
+    }
+  }
+  return out;
+}
+
+function mavUnpack(code) {
+  // 标准 eval(function(p,a,c,k,e,d){...}('p',a,c,'k'.split('|'))) 解包
+  var m = /\}\('((?:[^'\\]|\\.)*)',\s*(\d+),\s*(\d+),\s*'((?:[^'\\]|\\.)*)'\.split\('\|'\)/.exec(code);
+  if (!m) return "";
+  var p = m[1].replace(/\\'/g, "'"), a = +m[2], c = +m[3], k = m[4].split("|");
+  function e(n) { return (n < a ? "" : e(parseInt(n / a, 10))) + ((n = n % a) > 35 ? String.fromCharCode(n + 29) : n.toString(36)); }
+  var dict = {};
+  while (c--) dict[e(c)] = k[c] || e(c);
+  return p.replace(/\b\w+\b/g, function (w) { return dict[w] != null ? dict[w] : w; });
+}
+
+function mavPlaylist(html) {
+  var raw = String(html).replace(/\\\//g, "/").replace(/\\u002f/gi, "/");
+  var direct = /https?:\/\/(?:surrit|nineyu|fourhoi)\.(?:com|store)\/[0-9a-f-]{36}\/playlist\.m3u8/i.exec(raw);
+  if (direct) return direct[0];
+  var tok = /m3u8\|([a-f0-9|]+)\|com\|(surrit|nineyu|fourhoi)\|https/i.exec(raw);
+  if (tok) {
+    var u = tok[1].split("|").reverse().join("-");
+    if (MAV_UUID.test(u)) return "https://" + tok[2] + ".com/" + u + "/playlist.m3u8";
+  }
+  var ev = raw.indexOf("eval(function(p,a,c,k,e,d)");
+  while (ev >= 0) {
+    var un = mavUnpack(raw.slice(ev, ev + 20000));
+    var d2 = /https?:\/\/[^"'\s;]+\.m3u8/i.exec(un);
+    if (d2) return d2[0];
+    ev = raw.indexOf("eval(function(p,a,c,k,e,d)", ev + 10);
+  }
+  var cdn = /((?:surrit|nineyu|fourhoi)\.(?:com|store))\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\//i.exec(raw);
+  if (cdn) return "https://" + cdn[1] + "/" + cdn[2] + "/playlist.m3u8";
+  return "";
+}
+
+function mavMeta(html, prop) {
+  var re = new RegExp('<meta[^>]+(?:property|name)="' + prop + '"[^>]+content="([^"]*)"', "i");
+  var m = re.exec(html);
+  if (!m) { re = new RegExp('<meta[^>]+content="([^"]*)"[^>]+(?:property|name)="' + prop + '"', "i"); m = re.exec(html); }
+  return m ? mavText(m[1]) : "";
+}
+
+function mavField(html, labels) {
+  for (var i = 0; i < labels.length; i++) {
+    var re = new RegExp("<span>\\s*" + labels[i] + "\\s*[:：]?\\s*</span>([\\s\\S]{0,800}?)</div>", "i");
+    var m = re.exec(html);
+    if (m) {
+      var names = [], r2 = /<a[^>]*>([\s\S]*?)<\/a>/g, a;
+      while ((a = r2.exec(m[1]))) { var t = mavText(a[1]); if (t) names.push(t); }
+      if (names.length) return names;
+      var t2 = mavText(m[1]); if (t2) return [t2];
+    }
+  }
+  return [];
+}
+
+function mavHeaders() {
+  return { "User-Agent": MAV_UA, Referer: MAV_ORIGIN + "/", Origin: MAV_ORIGIN };
+}
+
+async function loadMav(params) {
+  params = params || {};
+  var cat = String(params.cat || "new");
+  var ok = MAV_CATS.some(function (c) { return c[0] === cat; });
+  if (!ok) cat = "new";
+  var page = insPage(params);
+  return mavParseList(await mavGet("/cn/" + cat + (page > 1 ? "?page=" + page : "")));
+}
+
+async function mavSearch(kw, page) {
+  return mavParseList(await mavGet("/cn/search/" + encodeURIComponent(kw) + (page > 1 ? "?page=" + page : "")));
+}
+
+async function mavDetail(slug) {
+  var html = await mavGet("/cn/" + encodeURIComponent(slug));
+  var title = mavMeta(html, "og:title") || mavText((/<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html) || [])[1]);
+  title = title.replace(/\s*-\s*MissAV.*$/i, "");
+  var it = mavItem(slug, title, mavMeta(html, "og:image"), "");
+  var desc = mavMeta(html, "og:description") || mavMeta(html, "description");
+  var actors = mavField(html, ["女优", "女優", "Actress"]);
+  var genres = mavField(html, ["类型", "類型", "Genre"]);
+  var date = mavField(html, ["发行日期", "發行日期", "Release date"]);
+  it.description = desc || "MissAV";
+  if (genres.length) it.genreTitle = genres.slice(0, 3).join(" / ");
+  if (date.length && /^\d{4}-\d{2}-\d{2}/.test(date[0])) it.releaseDate = date[0].slice(0, 10);
+  if (actors.length) it.peoples = actors.map(function (n, i) { return { id: "mav-actor-" + i, title: n, role: "女优" }; });
+  var pl = mavPlaylist(html);
+  if (pl) { it.videoUrl = pl; it.playerType = "app"; it.customHeaders = mavHeaders(); }
+  return { item: it, playlist: pl };
 }
