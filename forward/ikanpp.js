@@ -1,9 +1,10 @@
 /**
  * 影视聚合 · Rex / Forward 模块（ForwardWidget 格式）
- * 站点：爱看片片 https://www.ikanpp.com 、nnyy 努努影院 https://nnyy.in 、小蜜蜂影院 https://www.xmfyy.com
- * link 前缀：ik:（爱看片片，旧链接都是这个）/ nn:（努努影院）/ xm:（小蜜蜂影院），详情/播放按前缀分发
+ * 站点：爱看片片 https://www.ikanpp.com 、nnyy 努努影院 https://nnyy.in 、小蜜蜂影院 https://www.xmfyy.com 、爱看机器人 https://www.ikanbot.com
+ * link 前缀：ik:（爱看片片，旧链接都是这个）/ nn:（努努影院）/ xm:（小蜜蜂影院）/ kb:（爱看机器人），详情/播放按前缀分发
  *  - 努努影院：分类页 HTML 解析（?country/genre/year/ob/page），播放走站点 /_gp/<id>/<集> 接口，直接给各线路 m3u8
  *  - 小蜜蜂影院：/filter 筛选页、/search 搜索页 HTML 解析，播放走站点 /api/play-url，iframe 线路跳过
+ *  - 爱看机器人：/hot 豆瓣榜单页、/category 分类页、/search 搜索页 HTML 解析；播放页 current_id+e_token 按站点前端规则算 token，请求 /api/getResN 取全部线路 m3u8；豆瓣封面走 hghub-db 代理补 Referer
  *
  * 说明：
  *  - 列表走站点自己的片库接口 /api/library/browse（电影/剧集/动漫/综艺/纪录片，可按类型、地区、排序筛选）。
@@ -19,10 +20,10 @@ WidgetMetadata = {
   icon: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   iconUrl: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   logo: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
-  description: "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，三站聚合搜索，多线路播放",
+  description: "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院 + 爱看机器人（全网线路聚合），四站聚合搜索，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.23.8",
+  version: "2026.11.24.1",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
@@ -3027,6 +3028,209 @@ WidgetMetadata = {
       ]
     },
     {
+      "id": "kb_hot_movie",
+      "title": "爱看机器人·电影榜",
+      "functionName": "loadKbHot",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "kind",
+          "title": "类别",
+          "type": "constant",
+          "value": "movie"
+        },
+        {
+          "name": "tag",
+          "title": "标签",
+          "type": "enumeration",
+          "value": "热门",
+          "enumOptions": [
+            {
+              "title": "热门",
+              "value": "热门"
+            },
+            {
+              "title": "最新",
+              "value": "最新"
+            },
+            {
+              "title": "经典",
+              "value": "经典"
+            },
+            {
+              "title": "豆瓣高分",
+              "value": "豆瓣高分"
+            },
+            {
+              "title": "冷门佳片",
+              "value": "冷门佳片"
+            },
+            {
+              "title": "华语",
+              "value": "华语"
+            },
+            {
+              "title": "欧美",
+              "value": "欧美"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "动作",
+              "value": "动作"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "恐怖",
+              "value": "恐怖"
+            },
+            {
+              "title": "动画",
+              "value": "动画"
+            },
+            {
+              "title": "豆瓣top250",
+              "value": "豆瓣top250"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "kb_hot_tv",
+      "title": "爱看机器人·剧集榜",
+      "functionName": "loadKbHot",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "kind",
+          "title": "类别",
+          "type": "constant",
+          "value": "tv"
+        },
+        {
+          "name": "tag",
+          "title": "标签",
+          "type": "enumeration",
+          "value": "热门",
+          "enumOptions": [
+            {
+              "title": "热门",
+              "value": "热门"
+            },
+            {
+              "title": "国产剧",
+              "value": "国产剧"
+            },
+            {
+              "title": "港剧",
+              "value": "港剧"
+            },
+            {
+              "title": "韩剧",
+              "value": "韩剧"
+            },
+            {
+              "title": "日剧",
+              "value": "日剧"
+            },
+            {
+              "title": "美剧",
+              "value": "美剧"
+            },
+            {
+              "title": "英剧",
+              "value": "英剧"
+            },
+            {
+              "title": "综艺",
+              "value": "综艺"
+            },
+            {
+              "title": "日本动画",
+              "value": "日本动画"
+            },
+            {
+              "title": "纪录片",
+              "value": "纪录片"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "kb_category",
+      "title": "爱看机器人·最新入库",
+      "functionName": "loadKbCategory",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "cat",
+          "title": "分类",
+          "type": "enumeration",
+          "value": "1",
+          "enumOptions": [
+            {
+              "title": "电影",
+              "value": "1"
+            },
+            {
+              "title": "剧集",
+              "value": "2"
+            },
+            {
+              "title": "动漫",
+              "value": "18"
+            },
+            {
+              "title": "综艺",
+              "value": "19"
+            },
+            {
+              "title": "纪录片",
+              "value": "20"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
       // id 需固定为 loadResource：起播 / 切线路时现取各条源的播放地址
       id: "loadResource",
       title: "加载资源",
@@ -3048,7 +3252,7 @@ WidgetMetadata = {
         "value": "all",
         "enumOptions": [
           {
-            "title": "全部（爱看片片 + nnyy + 小蜜蜂）",
+            "title": "全部（爱看片片 + nnyy + 小蜜蜂 + 爱看机器人）",
             "value": "all"
           },
           {
@@ -3062,6 +3266,10 @@ WidgetMetadata = {
           {
             "title": "小蜜蜂影院",
             "value": "xm"
+          },
+          {
+            "title": "爱看机器人",
+            "value": "kb"
           }
         ]
       },
@@ -3989,7 +4197,7 @@ async function xmLoadResource(params) {
 
 // ---------------- 分发：搜索 / 详情 / 播放 ----------------
 
-var VS_SITES = { ik: "爱看片片", nn: "nnyy", xm: "小蜜蜂" };
+var VS_SITES = { ik: "爱看片片", nn: "nnyy", xm: "小蜜蜂", kb: "爱看机器人" };
 
 function vsTag(list, site) {
   return (list || []).map(function (x) {
@@ -4008,6 +4216,7 @@ async function search(params) {
   if (site === "all" || site === "ik") jobs.push(["ik", function () { return ikSearch({ keyword: kw, page: page }); }]);
   if (site === "all" || site === "nn") jobs.push(["nn", function () { return nnSearch(kw, page); }]);
   if (site === "all" || site === "xm") jobs.push(["xm", function () { return xmSearch(kw, page); }]);
+  if (site === "all" || site === "kb") jobs.push(["kb", function () { return kbSearch(kw, page); }]);
   var results = await Promise.all(jobs.map(function (j) {
     return Promise.resolve().then(j[1]).then(function (r) { return vsTag(r, j[0]); }, function (e) {
       console.log("搜索失败 " + j[0] + "：" + (e && e.message));
@@ -4023,6 +4232,7 @@ async function loadDetail(link) {
   var s = String(link || "");
   if (s.indexOf("nn:") === 0) return nnLoadDetail(s);
   if (s.indexOf("xm:") === 0) return xmLoadDetail(s);
+  if (s.indexOf("kb:") === 0) return kbLoadDetail(s);
   return ikLoadDetail(s);
 }
 
@@ -4031,5 +4241,279 @@ async function loadResource(params) {
   var s = String(params.link || params.id || "");
   if (s.indexOf("nn:") === 0) return nnLoadResource(params);
   if (s.indexOf("xm:") === 0) return xmLoadResource(params);
+  if (s.indexOf("kb:") === 0) return kbLoadResource(params);
   return ikLoadResource(params);
+}
+
+// =====================================================================
+// 爱看机器人（ikanbot.com） link：kb:<id>:<集序号，0=整部>
+//  - 列表：/hot/index-<movie|tv>-<标签>[-p-N].html（豆瓣热门榜），/category/<分类>?p=N（最新入库）
+//  - 搜索：/search?q=（下一页用页面里带游标 n 的链接）
+//  - 播放：/play/<id> 页里的 current_id + e_token 按站点前端规则算出 token，再请求 /api/getResN
+// =====================================================================
+
+var KB_ORIGIN = "https://www.ikanbot.com";
+var KB_IMG_PROXY = "https://hghub-db.hghub-zhang.workers.dev/?url=";
+
+function kbParseLink(link) {
+  var m = /^kb:(\d+)(?::(\d+))?$/.exec(String(link || ""));
+  return m ? { id: m[1], ep: parseInt(m[2] || "0", 10) || 0 } : null;
+}
+
+function kbLink(id, ep) {
+  return "kb:" + id + ":" + (ep || 0);
+}
+
+function kbImg(u) {
+  u = String(u || "").trim();
+  if (!u || /^data:/.test(u)) return "";
+  if (u.indexOf("//") === 0) u = "https:" + u;
+  if (u.charAt(0) === "/") u = KB_ORIGIN + u;
+  // 豆瓣图床要豆瓣 Referer，否则 418，走代理补 Referer
+  if (/^https:\/\/img\d*\.doubanio\.com\//i.test(u)) return KB_IMG_PROXY + encodeURIComponent(u);
+  return u;
+}
+
+function kbItem(id, title, img, sub) {
+  var l = kbLink(id, 0);
+  var it = { id: l, type: "url", title: title || id, mediaType: "tv", link: l };
+  var c = kbImg(img);
+  if (c) { it.posterPath = c; it.coverUrl = c; }
+  if (sub) it.description = sub;
+  return it;
+}
+
+// 列表页（热门榜 / 分类页）卡片
+function kbParseCards(html) {
+  var out = [];
+  var re = /<a class="item" href="\/play\/(\d+)"[\s\S]*?<img[^>]*?alt="([^"]*)"[^>]*?data-src="([^"]*)"[\s\S]*?<p>([\s\S]*?)<\/p>/g;
+  var m;
+  while ((m = re.exec(html))) out.push(kbItem(m[1], vsText(m[4]) || vsText(m[2]), m[3]));
+  return vsDedup(out);
+}
+
+async function loadKbHot(params) {
+  params = params || {};
+  var kind = params.kind === "tv" ? "tv" : "movie";
+  var tag = params.tag || "热门";
+  var page = vsPageNo(params);
+  var url = KB_ORIGIN + "/hot/index-" + kind + "-" + encodeURIComponent(tag) + (page > 1 ? "-p-" + page : "") + ".html";
+  return kbParseCards(await vsGet(url, { Referer: KB_ORIGIN + "/" }, "爱看机器人列表"));
+}
+
+async function loadKbCategory(params) {
+  params = params || {};
+  var cat = params.cat || "1";
+  var page = vsPageNo(params);
+  var url = KB_ORIGIN + "/category/" + cat + (page > 1 ? "?p=" + page : "");
+  return kbParseCards(await vsGet(url, { Referer: KB_ORIGIN + "/" }, "爱看机器人分类"));
+}
+
+function kbParseSearch(html) {
+  var out = [];
+  var re = /<a href="\/play\/(\d+)" class="cover-link">[\s\S]*?<img[^>]*?alt="([^"]*)"[^>]*?data-src="([^"]*)"[\s\S]*?class="title-text">([\s\S]*?)<\/a>([\s\S]*?)<\/div>/g;
+  var m;
+  while ((m = re.exec(html))) {
+    var t = vsText(m[4]).replace(/\s+/g, " ");
+    var rest = m[5];
+    var lines = /\[(\d+)条线路/.exec(rest);
+    var smalls = [];
+    var sre = /<span class="small"[^>]*>([\s\S]*?)<\/span>/g, s;
+    while ((s = sre.exec(rest))) { var v = vsText(s[1]); if (v) smalls.push(v); }
+    var sub = (lines ? lines[1] + "条线路" : "") + (smalls.length ? (lines ? " · " : "") + smalls.join(" · ") : "");
+    out.push(kbItem(m[1], t || vsText(m[2]), m[3], sub));
+  }
+  return vsDedup(out);
+}
+
+async function kbSearch(kw, page) {
+  page = page > 0 ? page : 1;
+  if (page > 5) return [];
+  var url = KB_ORIGIN + "/search?q=" + encodeURIComponent(kw);
+  var html = "";
+  for (var i = 1; i <= page; i++) {
+    html = await vsGet(url, { Referer: KB_ORIGIN + "/" }, "爱看机器人搜索");
+    if (i === page) break;
+    var nx = /href="(\/search\?q=[^"]*?p=(\d+)[^"]*)"/g, m, next = "";
+    while ((m = nx.exec(html))) { if (parseInt(m[2], 10) === i + 1) { next = m[1].replace(/&amp;/g, "&"); break; } }
+    if (!next) return [];
+    url = KB_ORIGIN + next;
+  }
+  return kbParseSearch(html);
+}
+
+// 站点前端 get_tks()：取 id 末 4 位，每位 d → 跳过 d%3+1 个字符取 8 个
+function kbToken(cid, etoken) {
+  var d = String(cid).slice(-4);
+  var parts = [];
+  var e = String(etoken || "");
+  for (var i = 0; i < d.length; i++) {
+    var s = (parseInt(d[i], 10) % 3) + 1;
+    parts.push(e.substring(s, s + 8));
+    e = e.substring(s + 8);
+  }
+  return parts.join("");
+}
+
+var KB_FLAG_NAMES = { db: "豆瓣", xl: "新浪", gs: "光速", js: "极速", bfzy: "暴风", ff: "非凡", lz: "量子", hn: "红牛", ik: "iKun", wj: "无尽", md: "魔都", uk: "U酷", sn: "索尼", yh: "樱花", sd: "闪电", zd: "最大", jy: "金鹰", hh: "豪华", tk: "天空", wl: "卧龙", bd: "百度" };
+function kbLineName(flag) {
+  var f = String(flag || "").toLowerCase().replace(/m3u8$/, "");
+  var k = f.replace(/zy\d*$/, "");
+  return KB_FLAG_NAMES[f] || KB_FLAG_NAMES[k] || NN_LINE_NAMES[f] || NN_LINE_NAMES[k + "zy"] || (f ? f.toUpperCase() : "线路");
+}
+
+async function kbFetch(id) {
+  var page = KB_ORIGIN + "/play/" + id;
+  // 播放页带 Referer 反而会被拒（403 / 断开），这里不带
+  var html = await vsGet(page, {}, "爱看机器人详情");
+  var g = function (re) { var m = re.exec(html); return m ? m[1] : ""; };
+  var cid = g(/id="current_id" value="(\d+)"/) || id;
+  var et = g(/id="e_token" value="([^"]*)"/);
+  var mtype = g(/id="mtype" value="(\d+)"/) || "1";
+  var info = {
+    id: cid,
+    mtype: mtype,
+    title: vsText(g(/<h2 class="meta title">([\s\S]*?)<\/h2>/)) || vsText(g(/<h1 id="video_title"[^>]*>([\s\S]*?)<\/h1>/)) || id,
+    cover: kbImg(g(/property="og:image" content="([^"]*)"/) || g(/class="cover lazy" data-src="([^"]*)"/)),
+    aka: "", year: "", area: "", director: "", actors: [],
+  };
+  var metas = [];
+  var mre = /<h3 class="meta">([\s\S]*?)<\/h3>/g, mm;
+  while ((mm = mre.exec(html))) metas.push(vsText(mm[1]));
+  metas.forEach(function (v) {
+    if (/^\d{4}$/.test(v)) info.year = v;
+    else if (v.indexOf("/") >= 0 && !info.director) {
+      var p = v.split("/");
+      info.director = p[0];
+      info.actors = (p[1] || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+    } else if (!info.aka && metas.indexOf(v) === 0) info.aka = v;
+    else if (!info.area) info.area = v;
+  });
+  var lines = [];
+  if (et) {
+    var d = await vsGet(KB_ORIGIN + "/api/getResN" + vsQs({ videoId: cid, mtype: mtype, token: kbToken(cid, et) }), {
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+      Referer: page,
+    }, "爱看机器人线路");
+    if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { d = null; } }
+    var list = d && d.state == 1 && d.data && Array.isArray(d.data.list) ? d.data.list : [];
+    list.forEach(function (row) {
+      var res = [];
+      try { res = typeof row.resData === "string" ? JSON.parse(row.resData) : row.resData || []; } catch (e) { res = []; }
+      (res || []).forEach(function (r) {
+        var eps = [];
+        String((r && r.url) || "").split("#").forEach(function (seg) {
+          var i = seg.indexOf("$");
+          if (i < 0) return;
+          var nm = seg.slice(0, i).trim(), u = seg.slice(i + 1).trim();
+          if (nm && /^https?:\/\/\S+m3u8$/i.test(u)) eps.push({ name: nm, url: u });
+        });
+        if (eps.length) lines.push({ name: kbLineName(r.flag), eps: eps });
+      });
+    });
+  }
+  info.lines = lines;
+  return info;
+}
+
+function kbIsExtra(name) {
+  return /预告|花絮|片花|彩蛋|先导|特辑|幕后/.test(name || "");
+}
+
+// 剧集：以集数最多的线路为准；电影：每条线路取正片
+function kbEpisodes(info) {
+  if (info.mtype == "1") return [{ name: "正片" }];
+  var best = null;
+  info.lines.forEach(function (l) {
+    var n = l.eps.filter(function (e) { return !kbIsExtra(e.name); }).length;
+    if (!best || n > best.n) best = { n: n, l: l };
+  });
+  if (!best) return [];
+  return best.l.eps.filter(function (e) { return !kbIsExtra(e.name); }).map(function (e) { return { name: e.name }; });
+}
+
+function kbSources(info, epIndex) {
+  var out = [];
+  var seen = {};
+  var cnt = {};
+  var push = function (lineName, e, extra) {
+    if (!e || seen[e.url]) return;
+    seen[e.url] = true;
+    cnt[lineName] = (cnt[lineName] || 0) + 1;
+    out.push({
+      name: (cnt[lineName] > 1 ? lineName + cnt[lineName] : lineName) + (extra ? " · " + e.name : ""),
+      description: "HLS",
+      url: e.url,
+      customHeaders: { "User-Agent": VS_UA },
+      playerType: "app",
+    });
+  };
+  if (info.mtype == "1") {
+    var trailers = [];
+    info.lines.forEach(function (l) {
+      l.eps.forEach(function (e) {
+        if (kbIsExtra(e.name)) trailers.push([l.name, e]);
+        else push(l.name, e, l.eps.length > 1);
+      });
+    });
+    if (!out.length) trailers.forEach(function (t) { push(t[0], t[1], true); });
+    return out;
+  }
+  var eps = kbEpisodes(info);
+  var target = eps[epIndex - 1];
+  if (!target) return out;
+  info.lines.forEach(function (l) {
+    var main = l.eps.filter(function (e) { return !kbIsExtra(e.name); });
+    var hit = main.find(function (e) { return e.name === target.name; });
+    if (!hit && main.length === eps.length) hit = main[epIndex - 1];
+    push(l.name, hit, false);
+  });
+  return out;
+}
+
+async function kbLoadDetail(link) {
+  var ref = kbParseLink(link);
+  if (!ref) return null;
+  var info = await kbFetch(ref.id);
+  var isMovie = info.mtype == "1";
+  var base = kbLink(ref.id, 0);
+  var item = { id: base, type: "url", title: info.title, mediaType: isMovie ? "movie" : "tv", link: base };
+  if (info.cover) { item.posterPath = info.cover; item.coverUrl = info.cover; }
+  if (info.year) item.releaseDate = info.year;
+  var desc = [];
+  if (info.aka) desc.push("又名：" + info.aka);
+  if (info.area) desc.push("地区：" + info.area);
+  if (info.director) desc.push("导演：" + info.director);
+  if (info.actors.length) desc.push("主演：" + info.actors.slice(0, 8).join("、"));
+  desc.push("线路：" + info.lines.length + " 条");
+  item.description = desc.join("\n");
+  if (info.actors.length) item.peoples = info.actors.slice(0, 12).map(function (n, i) { return { id: "actor-" + i, title: n, role: "演员" }; });
+  var eps = kbEpisodes(info);
+  if (!eps.length || !info.lines.length) {
+    item.description += "\n（暂无可用播放源）";
+    return item;
+  }
+  item.episodeItems = eps.map(function (e, i) {
+    var l = kbLink(ref.id, i + 1);
+    var ep = { id: l, type: "url", title: e.name || "第" + (i + 1) + "集", mediaType: item.mediaType, episode: i + 1, link: l };
+    if (info.cover) ep.coverUrl = info.cover;
+    return ep;
+  });
+  var first = kbSources(info, ref.ep || 1);
+  if (first.length) { item.videoUrl = first[0].url; item.playerType = "app"; }
+  if (ref.ep) {
+    item.id = kbLink(ref.id, ref.ep);
+    item.link = item.id;
+    item.episode = ref.ep;
+  }
+  return item;
+}
+
+async function kbLoadResource(params) {
+  var ref = kbParseLink(params.link || params.id);
+  if (!ref) return [];
+  var n = ref.ep || parseInt(params.episode, 10) || 1;
+  var info = await kbFetch(ref.id);
+  return kbSources(info, n);
 }
