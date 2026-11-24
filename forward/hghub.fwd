@@ -38,15 +38,6 @@
       "version": "2026.11.23.8",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js"
-    },
-    {
-      "id": "hghub.insav",
-      "title": "Insav",
-      "description": "Insav 免费放送（主站 / 无码 / 4K）+ MissAV 分类与搜索，在线播放（18+）",
-      "requiredVersion": "0.0.2",
-      "version": "2026.11.24.3",
-      "author": "nico123-code",
-      "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/insav.js"
     }
   ]
 }
