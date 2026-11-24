@@ -12,13 +12,46 @@ WidgetMetadata = {
   "icon": "https://m.xgshort.com/xiguaLogo.png",
   "iconUrl": "https://m.xgshort.com/xiguaLogo.png",
   "logo": "https://m.xgshort.com/xiguaLogo.png",
-  "description": "热门短剧（西瓜短剧 m.xgshort.com）：短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
+  "description": "热门短剧（西瓜短剧 m.xgshort.com）：最新更新、短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.24.1",
+  "version": "2026.11.24.2",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
+    {
+      "id": "latest",
+      "title": "最新更新",
+      "functionName": "loadLatest",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "ch",
+          "title": "频道",
+          "type": "enumeration",
+          "value": "all",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": "all"
+            },
+            {
+              "title": "短剧",
+              "value": "1"
+            },
+            {
+              "title": "AI短剧",
+              "value": "71"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
     {
       "id": "drama",
       "title": "短剧",
@@ -436,10 +469,6 @@ WidgetMetadata = {
             {
               "title": "全部年份",
               "value": "0"
-            },
-            {
-              "title": "2026",
-              "value": "14"
             },
             {
               "title": "2025",
@@ -909,10 +938,6 @@ WidgetMetadata = {
               "value": "0"
             },
             {
-              "title": "2026",
-              "value": "14"
-            },
-            {
               "title": "2025",
               "value": "1"
             },
@@ -1276,4 +1301,23 @@ async function loadResource(params) {
   }
   if (!key) return [];
   return xgPlayback(key, no);
+}
+
+// 最新更新：按入库时间倒序（站点排序 0 = 最新）；「全部」把短剧和 AI短剧同页合并后按时间排
+async function loadLatest(params) {
+  params = params || {};
+  var ch = String(params.ch || "all");
+  var chs = ch === "all" ? ["1", "71"] : [ch];
+  var page = xgPage(params);
+  var all = [];
+  for (var i = 0; i < chs.length; i++) {
+    try {
+      var d = await xgGet("/api/list/getfiltersdata", { channeid: chs[i], ids: "0,0,0,0,0,0,0", page: page, size: 20 }, false);
+      all = all.concat((d && d.data && d.data.list) || []);
+    } catch (e) {
+      console.log("[热门短剧] 最新更新失败:", chs[i], e && e.message);
+    }
+  }
+  all.sort(function (a, b) { return String(b.createdAt || "").localeCompare(String(a.createdAt || "")); });
+  return xgMap(all);
 }
