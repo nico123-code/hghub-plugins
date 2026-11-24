@@ -42,9 +42,9 @@
     {
       "id": "hghub.insav",
       "title": "Insav",
-      "description": "Insav（insav.tv）免费放送：主站 / 无码 / 动漫 / 4K 四个分站，在线播放（18+）",
+      "description": "Insav（insav.tv）免费放送：主站 / 无码 / 4K 三个分站，在线播放（18+）",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.24.1",
+      "version": "2026.11.24.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/insav.js"
     }

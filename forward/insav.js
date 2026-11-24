@@ -1,22 +1,21 @@
 /**
  * Insav · Rex / Forward 模块（ForwardWidget 格式）
- * 数据来自 insav.tv 的站内接口（主站 / 无码 / 动漫 / 4K 四个分站）。
+ * 数据来自 insav.tv 的站内接口（主站 / 无码 / 4K 三个分站）。
  * 只收录站点标注为免费（private=0）的视频；会员专享片不显示、也不取播放地址。
  * 封面经 Cloudflare Worker hghub-ins 解码后显示。
  */
 WidgetMetadata = {
   id: "hghub.insav",
   title: "Insav",
-  description: "Insav（insav.tv）免费放送：主站 / 无码 / 动漫 / 4K 四个分站，在线播放（18+）",
+  description: "Insav（insav.tv）免费放送：主站 / 无码 / 4K 三个分站，在线播放（18+）",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.24.1",
+  version: "2026.11.24.2",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
     { id: "ins_free_1", title: "免费·主站", functionName: "loadFree1", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
     { id: "ins_free_2", title: "免费·无码", functionName: "loadFree2", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
-    { id: "ins_free_3", title: "免费·动漫", functionName: "loadFree3", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
     { id: "ins_free_4", title: "免费·4K", functionName: "loadFree4", cacheDuration: 300, params: [{ name: "page", title: "页码", type: "page" }] },
     {
       id: "loadResource",
@@ -41,7 +40,7 @@ var CryptoJS=function(){var t={};return t.CryptoJS=function(){var t=t||function(
 
 var INS_API = "https://insav.tv/api/";
 var INS_COVER = "https://hghub-ins.hghub-zhang.workers.dev/?p=";
-var INS_SITES = { "1": "主站", "2": "无码", "3": "动漫", "4": "4K" };
+var INS_SITES = { "1": "主站", "2": "无码", "4": "4K" };
 var INS_KEY = CryptoJS.enc.Utf8.parse("0XxdjmI55ZjjqQLO3nI7gGqrBP0Vz9jS");
 var INS_IV = "RWf23muavY";
 var INS_SIGN = "NRkw0g3iJLDvw5tJ5PuVt5276z0SOuyL";
@@ -128,7 +127,6 @@ async function loadFree(params) {
 }
 async function loadFree1(p) { return loadFree({ site: "1", page: p && p.page }); }
 async function loadFree2(p) { return loadFree({ site: "2", page: p && p.page }); }
-async function loadFree3(p) { return loadFree({ site: "3", page: p && p.page }); }
 async function loadFree4(p) { return loadFree({ site: "4", page: p && p.page }); }
 
 async function search(params) {
@@ -136,7 +134,7 @@ async function search(params) {
   var kw = String(params.keyword || params.query || "").trim();
   if (!kw) return [];
   var page = insPage(params);
-  var jobs = ["1", "2", "3", "4"].map(function (s) {
+  var jobs = ["1", "2", "4"].map(function (s) {
     return insList(s, { page: page, limit: 30, keyword: kw }).catch(function () { return []; });
   });
   var rs = await Promise.all(jobs);
@@ -144,7 +142,7 @@ async function search(params) {
 }
 
 function insRef(link) {
-  var m = /^ins:([1-4]):(\d+)/.exec(String(link || ""));
+  var m = /^ins:([124]):(\d+)/.exec(String(link || ""));
   return m ? { site: m[1], vid: Number(m[2]) } : null;
 }
 
