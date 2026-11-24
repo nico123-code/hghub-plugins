@@ -20,13 +20,216 @@ WidgetMetadata = {
   icon: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   iconUrl: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   logo: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
-  description: "影视聚合：爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院 + 爱看机器人（全网线路聚合），四站聚合搜索，多线路播放",
+  description: "影视聚合：爱看机器人（全网线路聚合）+ 爱看片片（电影/剧集/动漫/综艺/纪录片/短剧）+ nnyy 努努影院 + 小蜜蜂影院，四站聚合搜索，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.24.1",
+  version: "2026.11.24.2",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
+    {
+      "id": "kb_hot_movie",
+      "title": "爱看机器人·电影榜",
+      "functionName": "loadKbHot",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "kind",
+          "title": "类别",
+          "type": "constant",
+          "value": "movie"
+        },
+        {
+          "name": "tag",
+          "title": "标签",
+          "type": "enumeration",
+          "value": "热门",
+          "enumOptions": [
+            {
+              "title": "热门",
+              "value": "热门"
+            },
+            {
+              "title": "最新",
+              "value": "最新"
+            },
+            {
+              "title": "经典",
+              "value": "经典"
+            },
+            {
+              "title": "豆瓣高分",
+              "value": "豆瓣高分"
+            },
+            {
+              "title": "冷门佳片",
+              "value": "冷门佳片"
+            },
+            {
+              "title": "华语",
+              "value": "华语"
+            },
+            {
+              "title": "欧美",
+              "value": "欧美"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "动作",
+              "value": "动作"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "恐怖",
+              "value": "恐怖"
+            },
+            {
+              "title": "动画",
+              "value": "动画"
+            },
+            {
+              "title": "豆瓣top250",
+              "value": "豆瓣top250"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "kb_hot_tv",
+      "title": "爱看机器人·剧集榜",
+      "functionName": "loadKbHot",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "kind",
+          "title": "类别",
+          "type": "constant",
+          "value": "tv"
+        },
+        {
+          "name": "tag",
+          "title": "标签",
+          "type": "enumeration",
+          "value": "热门",
+          "enumOptions": [
+            {
+              "title": "热门",
+              "value": "热门"
+            },
+            {
+              "title": "国产剧",
+              "value": "国产剧"
+            },
+            {
+              "title": "港剧",
+              "value": "港剧"
+            },
+            {
+              "title": "韩剧",
+              "value": "韩剧"
+            },
+            {
+              "title": "日剧",
+              "value": "日剧"
+            },
+            {
+              "title": "美剧",
+              "value": "美剧"
+            },
+            {
+              "title": "英剧",
+              "value": "英剧"
+            },
+            {
+              "title": "综艺",
+              "value": "综艺"
+            },
+            {
+              "title": "日本动画",
+              "value": "日本动画"
+            },
+            {
+              "title": "纪录片",
+              "value": "纪录片"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "kb_category",
+      "title": "爱看机器人·最新入库",
+      "functionName": "loadKbCategory",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "cat",
+          "title": "分类",
+          "type": "enumeration",
+          "value": "1",
+          "enumOptions": [
+            {
+              "title": "电影",
+              "value": "1"
+            },
+            {
+              "title": "剧集",
+              "value": "2"
+            },
+            {
+              "title": "动漫",
+              "value": "18"
+            },
+            {
+              "title": "综艺",
+              "value": "19"
+            },
+            {
+              "title": "纪录片",
+              "value": "20"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
     {
       "id": "browse_movie",
       "title": "爱看片片·电影",
@@ -3028,209 +3231,6 @@ WidgetMetadata = {
       ]
     },
     {
-      "id": "kb_hot_movie",
-      "title": "爱看机器人·电影榜",
-      "functionName": "loadKbHot",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "kind",
-          "title": "类别",
-          "type": "constant",
-          "value": "movie"
-        },
-        {
-          "name": "tag",
-          "title": "标签",
-          "type": "enumeration",
-          "value": "热门",
-          "enumOptions": [
-            {
-              "title": "热门",
-              "value": "热门"
-            },
-            {
-              "title": "最新",
-              "value": "最新"
-            },
-            {
-              "title": "经典",
-              "value": "经典"
-            },
-            {
-              "title": "豆瓣高分",
-              "value": "豆瓣高分"
-            },
-            {
-              "title": "冷门佳片",
-              "value": "冷门佳片"
-            },
-            {
-              "title": "华语",
-              "value": "华语"
-            },
-            {
-              "title": "欧美",
-              "value": "欧美"
-            },
-            {
-              "title": "韩国",
-              "value": "韩国"
-            },
-            {
-              "title": "日本",
-              "value": "日本"
-            },
-            {
-              "title": "动作",
-              "value": "动作"
-            },
-            {
-              "title": "喜剧",
-              "value": "喜剧"
-            },
-            {
-              "title": "爱情",
-              "value": "爱情"
-            },
-            {
-              "title": "科幻",
-              "value": "科幻"
-            },
-            {
-              "title": "悬疑",
-              "value": "悬疑"
-            },
-            {
-              "title": "恐怖",
-              "value": "恐怖"
-            },
-            {
-              "title": "动画",
-              "value": "动画"
-            },
-            {
-              "title": "豆瓣top250",
-              "value": "豆瓣top250"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
-    {
-      "id": "kb_hot_tv",
-      "title": "爱看机器人·剧集榜",
-      "functionName": "loadKbHot",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "kind",
-          "title": "类别",
-          "type": "constant",
-          "value": "tv"
-        },
-        {
-          "name": "tag",
-          "title": "标签",
-          "type": "enumeration",
-          "value": "热门",
-          "enumOptions": [
-            {
-              "title": "热门",
-              "value": "热门"
-            },
-            {
-              "title": "国产剧",
-              "value": "国产剧"
-            },
-            {
-              "title": "港剧",
-              "value": "港剧"
-            },
-            {
-              "title": "韩剧",
-              "value": "韩剧"
-            },
-            {
-              "title": "日剧",
-              "value": "日剧"
-            },
-            {
-              "title": "美剧",
-              "value": "美剧"
-            },
-            {
-              "title": "英剧",
-              "value": "英剧"
-            },
-            {
-              "title": "综艺",
-              "value": "综艺"
-            },
-            {
-              "title": "日本动画",
-              "value": "日本动画"
-            },
-            {
-              "title": "纪录片",
-              "value": "纪录片"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
-    {
-      "id": "kb_category",
-      "title": "爱看机器人·最新入库",
-      "functionName": "loadKbCategory",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "cat",
-          "title": "分类",
-          "type": "enumeration",
-          "value": "1",
-          "enumOptions": [
-            {
-              "title": "电影",
-              "value": "1"
-            },
-            {
-              "title": "剧集",
-              "value": "2"
-            },
-            {
-              "title": "动漫",
-              "value": "18"
-            },
-            {
-              "title": "综艺",
-              "value": "19"
-            },
-            {
-              "title": "纪录片",
-              "value": "20"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
-    {
       // id 需固定为 loadResource：起播 / 切线路时现取各条源的播放地址
       id: "loadResource",
       title: "加载资源",
@@ -3252,8 +3252,12 @@ WidgetMetadata = {
         "value": "all",
         "enumOptions": [
           {
-            "title": "全部（爱看片片 + nnyy + 小蜜蜂 + 爱看机器人）",
+            "title": "全部（爱看机器人 + 爱看片片 + nnyy + 小蜜蜂）",
             "value": "all"
+          },
+          {
+            "title": "爱看机器人",
+            "value": "kb"
           },
           {
             "title": "爱看片片",
@@ -3266,10 +3270,6 @@ WidgetMetadata = {
           {
             "title": "小蜜蜂影院",
             "value": "xm"
-          },
-          {
-            "title": "爱看机器人",
-            "value": "kb"
           }
         ]
       },
@@ -4213,10 +4213,10 @@ async function search(params) {
   var page = vsPageNo(params);
   var site = params.site || "all";
   var jobs = [];
+  if (site === "all" || site === "kb") jobs.push(["kb", function () { return kbSearch(kw, page); }]);
   if (site === "all" || site === "ik") jobs.push(["ik", function () { return ikSearch({ keyword: kw, page: page }); }]);
   if (site === "all" || site === "nn") jobs.push(["nn", function () { return nnSearch(kw, page); }]);
   if (site === "all" || site === "xm") jobs.push(["xm", function () { return xmSearch(kw, page); }]);
-  if (site === "all" || site === "kb") jobs.push(["kb", function () { return kbSearch(kw, page); }]);
   var results = await Promise.all(jobs.map(function (j) {
     return Promise.resolve().then(j[1]).then(function (r) { return vsTag(r, j[0]); }, function (e) {
       console.log("搜索失败 " + j[0] + "：" + (e && e.message));
