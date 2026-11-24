@@ -60,7 +60,6 @@
 | 模块 | 文件 | 功能 |
 | --- | --- | --- |
 | 黄果短剧 `hghub.huangguo` | `forward/huangguo.js` | 全部 / 分类（短剧、漫剧）、题材标签分类（题材、架空、男频、女频、伦理、关系、外貌、玩法、场景，共 96 个标签）、排行榜（热播 / 推荐 / 潜力）、搜索、分集列表、HLS 播放 |
-| 短剧聚合 `hghub.duanju` | `forward/duanju.js` | 聚合 3 个短剧平台（全集免费、无成人内容）：星芽短剧（推荐 / 男频 / 女频）、西饭短剧（推荐 / 都市 / 青春 / 现代言情 / 豪门 / 穿越 / 大女主 / 逆袭 / 打脸虐渣）、七猫短剧（55 个题材 / 情节 / 角色 / 风格标签）；搜索走星芽 + 西饭，可选全部或单个平台；选集播放 |
 | 影视聚合 `hghub.ikanpp` | `forward/ikanpp.js` | 聚合 3 个影视站：爱看片片 www.ikanpp.com（电影 / 剧集 / 动漫 / 综艺 / 纪录片，按类型、地区、排序筛选；短剧 10 个分类）、nnyy 努努影院 nnyy.in（电影 / 电视剧 / 综艺 / 动漫，按排序、类型、地区、年份筛选）、小蜜蜂影院 www.xmfyy.com（电影 / 电视剧 / 动漫 / 综艺，按排序、类型、地区、年份筛选）；搜索可选全部或单站；选集、多线路播放 |
 | 动漫聚合 `hghub.anime` | `forward/anime.js` | 聚合 3 个动漫站：girigiri爱动漫（新番时间表、日番 / 美番 / 剧场版 / 真人 / BD副音轨 / 其他，带筛选）、AGE动漫（最近更新、番剧目录：版本 / 地区 / 年份 / 季度 / 类型 / 状态 / 排序）、稀饭动漫 next.xifanacg.com（最近更新、新番时间表、番剧目录：排序 / 类型 / 题材 / 年份 / 状态）；搜索可选全部或单站；选集、多线路播放 |
 
@@ -70,7 +69,7 @@
 https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/hghub.fwd
 ```
 
-也可以只导入单个模块：`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/duanju.js`
+也可以只导入单个模块：`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/ikanpp.js`、`https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/anime.js`
 
 封面：黄果的封面图是 AES 加密的，Rex / Forward 不能解码，默认不显示封面。想要封面的话，把 `forward/cover-proxy-worker.js` 部署成 Cloudflare Worker，再在模块全局参数「封面解密代理」里填 `https://<你的子域>.workers.dev/?url=`。
 
