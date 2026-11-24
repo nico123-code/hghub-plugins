@@ -16,6 +16,15 @@
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js"
     },
     {
+      "id": "hghub.duanju",
+      "title": "短剧聚合",
+      "description": "短剧聚合：星芽短剧 + 西饭短剧 + 七猫短剧，分类浏览、聚合搜索、全集免费播放",
+      "requiredVersion": "0.0.2",
+      "version": "2026.11.24.1",
+      "author": "nico123-code",
+      "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/duanju.js"
+    },
+    {
       "id": "hghub.ikanpp",
       "title": "影视聚合",
       "icon": "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
