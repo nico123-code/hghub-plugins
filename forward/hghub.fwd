@@ -11,7 +11,7 @@
       "logo": "https://hghub-hg.hghub-zhang.workers.dev/huangguo.png",
       "description": "黄果短剧：分类、题材标签（已过滤男同）、榜单、搜索、分集播放（18+）",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.24.1",
+      "version": "2026.11.24.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/huangguo.js"
     },
