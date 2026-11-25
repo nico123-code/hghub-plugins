@@ -15,7 +15,7 @@ WidgetMetadata = {
   "description": "热门短剧（西瓜短剧 m.xgshort.com）：最新更新、短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.24.2",
+  "version": "2026.11.25.1",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -1018,6 +1018,7 @@ var XG_PREFIX = "xg:";
 var XG_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
 var XG_TOKEN_KEY = "xg_token";
 var XG_GUEST_KEY = "xg_guest";
+var XG_FAST = "https://hghub-xgv.hghub-zhang.workers.dev/?url=";
 // 男同 / 同性题材过滤（站点题材「同性」= 40，已从筛选里去掉；标题再按关键词兜底）
 var XG_BLOCK_RE = /男同|同性|gay|耽美|男男|基佬|\bBL\b/i;
 
@@ -1064,6 +1065,15 @@ async function xgLogin() {
     headers: Object.assign(xgHeaders(), { "Content-Type": "application/json" }),
   });
   var d = xgJson(res);
+  if (!d || !d.access_token) {
+    // 游客登录偶尔返回 500（短时间内新建游客过多），稍等再试一次
+    await new Promise(function (r) { setTimeout(r, 1500); });
+    guest = xgStore(XG_GUEST_KEY) || guest;
+    res = await Widget.http.post(XG_ORIGIN + "/api/auth/guest-login", guest ? { guestToken: guest } : {}, {
+      headers: Object.assign(xgHeaders(), { "Content-Type": "application/json" }),
+    });
+    d = xgJson(res);
+  }
   if ((!d || !d.access_token) && guest) {
     // 旧的游客标识失效时，用空标识重新领一个
     res = await Widget.http.post(XG_ORIGIN + "/api/auth/guest-login", {}, {
@@ -1220,16 +1230,16 @@ async function xgPlayback(key, epNo) {
     .sort(function (a, b) {
       return (XG_QORDER[String(b.quality || "").toUpperCase()] || 0) - (XG_QORDER[String(a.quality || "").toUpperCase()] || 0);
     });
-  return urls.map(function (u) {
+  // 源站 mp4 的 moov 索引在文件末尾，Rex 里会一直转圈；
+  // 优先走 hghub-xgv Worker（把 moov 挪到开头，视频数据按 Range 原样转发），原始地址作备用
+  var out = [];
+  urls.forEach(function (u) {
     var q = String(u.quality || "").toUpperCase() || "默认";
-    return {
-      name: q,
-      description: "第" + epNo + "集 · " + q,
-      url: String(u.cdnUrl || u.ossUrl),
-      customHeaders: { "User-Agent": XG_UA, Referer: XG_ORIGIN + "/" },
-      playerType: "app",
-    };
+    var raw = String(u.cdnUrl || u.ossUrl);
+    out.push({ name: q + " 秒开", description: "第" + epNo + "集 · " + q + " · 加速", url: XG_FAST + encodeURIComponent(raw), playerType: "app" });
+    out.push({ name: q + " 原始", description: "第" + epNo + "集 · " + q + " · 源站直连", url: raw, playerType: "app" });
   });
+  return out;
 }
 
 async function xgEpisodes(sid) {
