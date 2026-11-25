@@ -147,7 +147,15 @@ export default {
     if (partial) headers.set("Content-Range", "bytes " + a + "-" + b + "/" + total);
     if (request.method === "HEAD") return new Response(null, { status: partial ? 206 : 200, headers });
 
-    const { readable, writable } = new TransformStream();
+    // 只落在开头（ftyp+moov）里的范围：直接返回字节，带确定的 Content-Length
+    if (b < preLen) return new Response(p.pre.slice(a, b + 1), { status: partial ? 206 : 200, headers });
+    // 完全落在 mdat 里：直接转发源站的 206 响应体（源站自带长度）
+    if (a >= preLen) {
+      const r = await rangeGet(url, a - preLen + p.mdatOff, b - preLen + p.mdatOff);
+      return new Response(r.body, { status: partial ? 206 : 200, headers });
+    }
+    // 跨越两段：FixedLengthStream 保证 Content-Length（AVPlayer 不认 chunked 的 206）
+    const { readable, writable } = typeof FixedLengthStream !== "undefined" ? new FixedLengthStream(b - a + 1) : new TransformStream();
     (async () => {
       const w = writable.getWriter();
       try {

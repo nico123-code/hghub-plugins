@@ -23,7 +23,7 @@
       "logo": "https://m.xgshort.com/xiguaLogo.png",
       "description": "热门短剧（西瓜短剧）：最新更新、短剧 / AI短剧，排序·题材·年份·状态筛选，搜索，分集播放（已过滤男同题材）",
       "requiredVersion": "0.0.2",
-      "version": "2026.11.25.1",
+      "version": "2026.11.25.2",
       "author": "nico123-code",
       "url": "https://raw.githubusercontent.com/nico123-code/hghub-plugins/main/forward/xgshort.js"
     },

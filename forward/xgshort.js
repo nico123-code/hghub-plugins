@@ -15,7 +15,7 @@ WidgetMetadata = {
   "description": "热门短剧（西瓜短剧 m.xgshort.com）：最新更新、短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.25.1",
+  "version": "2026.11.25.2",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -985,6 +985,14 @@ WidgetMetadata = {
           "type": "page"
         }
       ]
+    },
+    {
+      "id": "loadResource",
+      "title": "加载资源",
+      "functionName": "loadResource",
+      "type": "stream",
+      "cacheDuration": 0,
+      "params": []
     }
   ],
   "search": {
