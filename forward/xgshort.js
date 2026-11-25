@@ -15,7 +15,7 @@ WidgetMetadata = {
   "description": "热门短剧（西瓜短剧 m.xgshort.com）：最新更新、短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.25.2",
+  "version": "2026.11.25.3",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -1247,6 +1247,13 @@ async function xgPlayback(key, epNo) {
     out.push({ name: q + " 秒开", description: "第" + epNo + "集 · " + q + " · 加速", url: XG_FAST + encodeURIComponent(raw), playerType: "app" });
     out.push({ name: q + " 原始", description: "第" + epNo + "集 · " + q + " · 源站直连", url: raw, playerType: "app" });
   });
+  // 预热：先让 Worker 把这一集的索引算好，播放器真正请求时直接命中（不等待结果）
+  if (out.length) {
+    try {
+      var w = Widget.http.get(out[0].url, { headers: { Range: "bytes=0-1" } });
+      if (w && w.catch) w.catch(function () {});
+    } catch (e) {}
+  }
   return out;
 }
 

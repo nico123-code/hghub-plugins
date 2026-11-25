@@ -63,18 +63,27 @@ function patchMoov(m, delta) {
   walk(8, m.length);
 }
 
-// 解析出 { pre: 开头字节(ftyp+moov改), mdatOff, mdatLen, total, passthrough }
+// 解析出 { pre: 开头字节(ftyp+改过的moov), mdatOff, mdatLen, total, passthrough }
+// 开头 64KB 和末尾 1MB 并行取，一次往返就能拿到 moov（moov 超过 1MB 时再补取）
+const TAIL = 1048576;
 async function plan(url) {
-  const r0 = await rangeGet(url, 0, 65535);
+  const [r0, r1] = await Promise.all([
+    rangeGet(url, 0, 65535),
+    fetch(url, { headers: { "User-Agent": UA, Range: "bytes=-" + TAIL } }),
+  ]);
   const cr = r0.headers.get("Content-Range") || "";
   const head = new Uint8Array(await r0.arrayBuffer());
   const total = Number((cr.match(/\/(\d+)/) || [])[1]) || head.length;
+  let suffix = r1.status === 206 || r1.status === 200 ? new Uint8Array(await r1.arrayBuffer()) : new Uint8Array(0);
+  if (r1.status === 200) suffix = suffix.slice(Math.max(0, suffix.length - TAIL));
+  const sufStart = total - suffix.length;
   const top = boxes(head, 0, head.length);
-  const moovFirst = top.find((x) => x.type === "moov");
   const mdat = top.find((x) => x.type === "mdat");
-  if (moovFirst || !mdat) return { passthrough: true, total };
+  if (top.find((x) => x.type === "moov") || !mdat) return { passthrough: true, total };
   const mdatEnd = mdat.off + mdat.size;
-  const tail = new Uint8Array(await (await rangeGet(url, mdatEnd, total - 1)).arrayBuffer());
+  let tail;
+  if (mdatEnd >= sufStart && suffix.length) tail = suffix.slice(mdatEnd - sufStart);
+  else tail = new Uint8Array(await (await rangeGet(url, mdatEnd, total - 1)).arrayBuffer());
   const mv = boxes(tail, 0, tail.length).find((x) => x.type === "moov");
   if (!mv) return { passthrough: true, total };
   const moov = tail.slice(mv.off, mv.off + mv.size);
@@ -83,23 +92,20 @@ async function plan(url) {
   patchMoov(moov, moov.length);
   const pre = new Uint8Array(preHead.length + moov.length);
   pre.set(preHead, 0); pre.set(moov, preHead.length);
-  return { passthrough: false, pre: Array.from(pre), mdatOff: mdat.off, mdatLen: mdat.size, total: pre.length + mdat.size };
+  return { passthrough: false, pre, mdatOff: mdat.off, mdatLen: mdat.size, total: pre.length + mdat.size };
 }
 
-async function getPlan(url) {
-  const cache = caches.default;
-  const key = new Request("https://plan.hghub-xgv.local/" + encodeURIComponent(url));
-  const hit = await cache.match(key);
-  if (hit) {
-    const j = await hit.json();
-    j.pre = j.pre ? new Uint8Array(j.pre) : null;
-    return j;
-  }
-  const p = await plan(url);
-  try {
-    await cache.put(key, new Response(JSON.stringify(p), { headers: { "Cache-Control": "public, max-age=86400", "Content-Type": "application/json" } }));
-  } catch (_) {}
-  p.pre = p.pre ? new Uint8Array(p.pre) : null;
+// workers.dev 上 Cache API 不生效，所以在 isolate 内存里缓存（同一集的后续 Range 请求直接命中）
+// 并发的同一 URL 只算一次
+const PLANS = new Map();
+const MAX_PLANS = 200;
+function getPlan(url) {
+  const hit = PLANS.get(url);
+  if (hit && hit.exp > Date.now()) return hit.p;
+  const p = plan(url);
+  PLANS.set(url, { p, exp: Date.now() + 6 * 3600 * 1000 });
+  p.catch(() => PLANS.delete(url));
+  if (PLANS.size > MAX_PLANS) PLANS.delete(PLANS.keys().next().value);
   return p;
 }
 
