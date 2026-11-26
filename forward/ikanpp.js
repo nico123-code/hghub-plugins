@@ -1,7 +1,8 @@
 /**
  * 影视聚合 · Rex / Forward 模块（ForwardWidget 格式）
- * 站点：奈飞工厂 https://www.netflixgc.com 、爱看片片 https://www.ikanpp.com 、小蜜蜂影院 https://www.xmfyy.com 、爱看机器人 https://www.ikanbot.com
- * link 前缀：nf:（奈飞工厂）/ ik:（爱看片片，旧链接都是这个）/ xm:（小蜜蜂影院）/ kb:（爱看机器人），详情/播放按前缀分发
+ * 站点：PandFlix https://pandflix.com 、奈飞工厂 https://www.netflixgc.com 、爱看片片 https://www.ikanpp.com 、小蜜蜂影院 https://www.xmfyy.com 、爱看机器人 https://www.ikanbot.com
+ * link 前缀：pf:（PandFlix）/ nf:（奈飞工厂）/ ik:（爱看片片，旧链接都是这个）/ xm:（小蜜蜂影院）/ kb:（爱看机器人），详情/播放按前缀分发
+ *  - PandFlix：/api/vod/browse 列表、/api/vod/search 搜索、/api/vod/detail 详情（直链 m3u8，按无水印+全站成功率排线路）
  *  - 奈飞工厂：/index.php/ds_api/vod 列表 JSON、/vodsearch 搜索页；播放页 player_aaaa 直链 m3u8，站点自有加密线路跳过
  *  - 小蜜蜂影院：/filter 筛选页、/search 搜索页 HTML 解析，播放走站点 /api/play-url，iframe 线路跳过
  *  - 爱看机器人：/hot 豆瓣榜单页、/category 分类页、/search 搜索页 HTML 解析；播放页 current_id+e_token 按站点前端规则算 token，请求 /api/getResN 取全部线路 m3u8；豆瓣封面走 hghub-db 代理补 Referer
@@ -20,13 +21,985 @@ WidgetMetadata = {
   icon: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   iconUrl: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
   logo: "https://hghub-icons.hghub-zhang.workers.dev/vod.png",
-  description: "影视聚合：奈飞工厂 + 爱看机器人（全网线路聚合）+ 爱看片片（电影/剧集/综艺/纪录片）+ 小蜜蜂影院，四站聚合搜索，多线路播放",
+  description: "影视聚合：PandFlix + 奈飞工厂 + 爱看机器人（全网线路聚合）+ 爱看片片（电影/剧集/综艺/纪录片）+ 小蜜蜂影院，五站聚合搜索，多线路播放",
   author: "nico123-code",
   site: "https://github.com/nico123-code/hghub-plugins",
-  version: "2026.11.24.4",
+  version: "2026.11.27.1",
   requiredVersion: "0.0.2",
   detailCacheDuration: 300,
   modules: [
+    {
+      "id": "pf_1",
+      "title": "PandFlix·电影",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "1"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "cls",
+          "title": "类型",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "动作",
+              "value": "动作"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "奇幻",
+              "value": "奇幻"
+            },
+            {
+              "title": "剧情",
+              "value": "剧情"
+            },
+            {
+              "title": "古装",
+              "value": "古装"
+            },
+            {
+              "title": "都市",
+              "value": "都市"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "犯罪",
+              "value": "犯罪"
+            },
+            {
+              "title": "战争",
+              "value": "战争"
+            },
+            {
+              "title": "动画",
+              "value": "动画"
+            },
+            {
+              "title": "纪录",
+              "value": "纪录"
+            },
+            {
+              "title": "武侠",
+              "value": "武侠"
+            },
+            {
+              "title": "青春",
+              "value": "青春"
+            }
+          ]
+        },
+        {
+          "name": "area",
+          "title": "地区",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中国大陆",
+              "value": "中国大陆"
+            },
+            {
+              "title": "中国香港",
+              "value": "中国香港"
+            },
+            {
+              "title": "中国台湾",
+              "value": "中国台湾"
+            },
+            {
+              "title": "美国",
+              "value": "美国"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "英国",
+              "value": "英国"
+            },
+            {
+              "title": "泰国",
+              "value": "泰国"
+            }
+          ]
+        },
+        {
+          "name": "lang",
+          "title": "语言",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中文",
+              "value": "中文"
+            },
+            {
+              "title": "英语",
+              "value": "英语"
+            },
+            {
+              "title": "日语",
+              "value": "日语"
+            },
+            {
+              "title": "粤语",
+              "value": "粤语"
+            },
+            {
+              "title": "韩语",
+              "value": "韩语"
+            },
+            {
+              "title": "泰语",
+              "value": "泰语"
+            },
+            {
+              "title": "法语",
+              "value": "法语"
+            },
+            {
+              "title": "西班牙语",
+              "value": "西班牙语"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            },
+            {
+              "title": "2018",
+              "value": "2018"
+            },
+            {
+              "title": "2017",
+              "value": "2017"
+            },
+            {
+              "title": "2016",
+              "value": "2016"
+            },
+            {
+              "title": "2015",
+              "value": "2015"
+            },
+            {
+              "title": "2014",
+              "value": "2014"
+            },
+            {
+              "title": "2013",
+              "value": "2013"
+            },
+            {
+              "title": "2012",
+              "value": "2012"
+            },
+            {
+              "title": "2011",
+              "value": "2011"
+            },
+            {
+              "title": "2010",
+              "value": "2010"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "pf_2",
+      "title": "PandFlix·剧集",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "2"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "cls",
+          "title": "类型",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "动作",
+              "value": "动作"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "奇幻",
+              "value": "奇幻"
+            },
+            {
+              "title": "剧情",
+              "value": "剧情"
+            },
+            {
+              "title": "古装",
+              "value": "古装"
+            },
+            {
+              "title": "都市",
+              "value": "都市"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "犯罪",
+              "value": "犯罪"
+            },
+            {
+              "title": "战争",
+              "value": "战争"
+            },
+            {
+              "title": "动画",
+              "value": "动画"
+            },
+            {
+              "title": "纪录",
+              "value": "纪录"
+            },
+            {
+              "title": "武侠",
+              "value": "武侠"
+            },
+            {
+              "title": "青春",
+              "value": "青春"
+            }
+          ]
+        },
+        {
+          "name": "area",
+          "title": "地区",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中国大陆",
+              "value": "中国大陆"
+            },
+            {
+              "title": "中国香港",
+              "value": "中国香港"
+            },
+            {
+              "title": "中国台湾",
+              "value": "中国台湾"
+            },
+            {
+              "title": "美国",
+              "value": "美国"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "英国",
+              "value": "英国"
+            },
+            {
+              "title": "泰国",
+              "value": "泰国"
+            }
+          ]
+        },
+        {
+          "name": "lang",
+          "title": "语言",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中文",
+              "value": "中文"
+            },
+            {
+              "title": "英语",
+              "value": "英语"
+            },
+            {
+              "title": "日语",
+              "value": "日语"
+            },
+            {
+              "title": "粤语",
+              "value": "粤语"
+            },
+            {
+              "title": "韩语",
+              "value": "韩语"
+            },
+            {
+              "title": "泰语",
+              "value": "泰语"
+            },
+            {
+              "title": "法语",
+              "value": "法语"
+            },
+            {
+              "title": "西班牙语",
+              "value": "西班牙语"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            },
+            {
+              "title": "2018",
+              "value": "2018"
+            },
+            {
+              "title": "2017",
+              "value": "2017"
+            },
+            {
+              "title": "2016",
+              "value": "2016"
+            },
+            {
+              "title": "2015",
+              "value": "2015"
+            },
+            {
+              "title": "2014",
+              "value": "2014"
+            },
+            {
+              "title": "2013",
+              "value": "2013"
+            },
+            {
+              "title": "2012",
+              "value": "2012"
+            },
+            {
+              "title": "2011",
+              "value": "2011"
+            },
+            {
+              "title": "2010",
+              "value": "2010"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "pf_3",
+      "title": "PandFlix·综艺",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "3"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "area",
+          "title": "地区",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中国大陆",
+              "value": "中国大陆"
+            },
+            {
+              "title": "中国香港",
+              "value": "中国香港"
+            },
+            {
+              "title": "中国台湾",
+              "value": "中国台湾"
+            },
+            {
+              "title": "美国",
+              "value": "美国"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "英国",
+              "value": "英国"
+            },
+            {
+              "title": "泰国",
+              "value": "泰国"
+            }
+          ]
+        },
+        {
+          "name": "lang",
+          "title": "语言",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中文",
+              "value": "中文"
+            },
+            {
+              "title": "英语",
+              "value": "英语"
+            },
+            {
+              "title": "日语",
+              "value": "日语"
+            },
+            {
+              "title": "粤语",
+              "value": "粤语"
+            },
+            {
+              "title": "韩语",
+              "value": "韩语"
+            },
+            {
+              "title": "泰语",
+              "value": "泰语"
+            },
+            {
+              "title": "法语",
+              "value": "法语"
+            },
+            {
+              "title": "西班牙语",
+              "value": "西班牙语"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            },
+            {
+              "title": "2018",
+              "value": "2018"
+            },
+            {
+              "title": "2017",
+              "value": "2017"
+            },
+            {
+              "title": "2016",
+              "value": "2016"
+            },
+            {
+              "title": "2015",
+              "value": "2015"
+            },
+            {
+              "title": "2014",
+              "value": "2014"
+            },
+            {
+              "title": "2013",
+              "value": "2013"
+            },
+            {
+              "title": "2012",
+              "value": "2012"
+            },
+            {
+              "title": "2011",
+              "value": "2011"
+            },
+            {
+              "title": "2010",
+              "value": "2010"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "pf_22",
+      "title": "PandFlix·纪录片",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "22"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "area",
+          "title": "地区",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中国大陆",
+              "value": "中国大陆"
+            },
+            {
+              "title": "中国香港",
+              "value": "中国香港"
+            },
+            {
+              "title": "中国台湾",
+              "value": "中国台湾"
+            },
+            {
+              "title": "美国",
+              "value": "美国"
+            },
+            {
+              "title": "韩国",
+              "value": "韩国"
+            },
+            {
+              "title": "日本",
+              "value": "日本"
+            },
+            {
+              "title": "英国",
+              "value": "英国"
+            },
+            {
+              "title": "泰国",
+              "value": "泰国"
+            }
+          ]
+        },
+        {
+          "name": "lang",
+          "title": "语言",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "中文",
+              "value": "中文"
+            },
+            {
+              "title": "英语",
+              "value": "英语"
+            },
+            {
+              "title": "日语",
+              "value": "日语"
+            },
+            {
+              "title": "粤语",
+              "value": "粤语"
+            },
+            {
+              "title": "韩语",
+              "value": "韩语"
+            },
+            {
+              "title": "泰语",
+              "value": "泰语"
+            },
+            {
+              "title": "法语",
+              "value": "法语"
+            },
+            {
+              "title": "西班牙语",
+              "value": "西班牙语"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            },
+            {
+              "title": "2018",
+              "value": "2018"
+            },
+            {
+              "title": "2017",
+              "value": "2017"
+            },
+            {
+              "title": "2016",
+              "value": "2016"
+            },
+            {
+              "title": "2015",
+              "value": "2015"
+            },
+            {
+              "title": "2014",
+              "value": "2014"
+            },
+            {
+              "title": "2013",
+              "value": "2013"
+            },
+            {
+              "title": "2012",
+              "value": "2012"
+            },
+            {
+              "title": "2011",
+              "value": "2011"
+            },
+            {
+              "title": "2010",
+              "value": "2010"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
     {
       "id": "nf_1",
       "title": "奈飞工厂·电影",
@@ -3181,8 +4154,12 @@ WidgetMetadata = {
         "value": "all",
         "enumOptions": [
           {
-            "title": "全部（奈飞工厂 + 爱看机器人 + 爱看片片 + 小蜜蜂）",
+            "title": "全部（PandFlix + 奈飞工厂 + 爱看机器人 + 爱看片片 + 小蜜蜂）",
             "value": "all"
+          },
+          {
+            "title": "PandFlix",
+            "value": "pf"
           },
           {
             "title": "奈飞工厂",
@@ -3947,7 +4924,7 @@ async function xmLoadResource(params) {
 
 // ---------------- 分发：搜索 / 详情 / 播放 ----------------
 
-var VS_SITES = { nf: "奈飞工厂", ik: "爱看片片", xm: "小蜜蜂", kb: "爱看机器人" };
+var VS_SITES = { pf: "PandFlix", nf: "奈飞工厂", ik: "爱看片片", xm: "小蜜蜂", kb: "爱看机器人" };
 
 function vsTag(list, site) {
   return (list || []).map(function (x) {
@@ -3963,6 +4940,7 @@ async function search(params) {
   var page = vsPageNo(params);
   var site = params.site || "all";
   var jobs = [];
+  if (site === "all" || site === "pf") jobs.push(["pf", function () { return pfSearch(kw, page); }]);
   if (site === "all" || site === "nf") jobs.push(["nf", function () { return nfSearch(kw, page); }]);
   if (site === "all" || site === "kb") jobs.push(["kb", function () { return kbSearch(kw, page); }]);
   if (site === "all" || site === "ik") jobs.push(["ik", function () { return ikSearch({ keyword: kw, page: page }); }]);
@@ -3980,6 +4958,7 @@ async function search(params) {
 
 async function loadDetail(link) {
   var s = String(link || "");
+  if (s.indexOf("pf:") === 0) return pfLoadDetail(s);
   if (s.indexOf("nf:") === 0) return nfLoadDetail(s);
   if (s.indexOf("xm:") === 0) return xmLoadDetail(s);
   if (s.indexOf("kb:") === 0) return kbLoadDetail(s);
@@ -3989,6 +4968,7 @@ async function loadDetail(link) {
 async function loadResource(params) {
   params = params || {};
   var s = String(params.link || params.id || "");
+  if (s.indexOf("pf:") === 0) return pfLoadResource(params);
   if (s.indexOf("nf:") === 0) return nfLoadResource(params);
   if (s.indexOf("xm:") === 0) return xmLoadResource(params);
   if (s.indexOf("kb:") === 0) return kbLoadResource(params);
@@ -4510,4 +5490,176 @@ async function nfLoadResource(params) {
   var info = await nfInfo(ref.id);
   info.id = ref.id;
   return nfSources(info, n, 8);
+}
+
+// =====================================================================
+// PandFlix（pandflix.com） link：pf:<id>:<集序号，0=整部>
+//  - 列表：GET /api/vod/browse?type=&cls=&area=&lang=&year=&sort=&page=&limit=（JSON）
+//    type：1 电影 / 2 剧集 / 3 综艺 / 22 纪录片（4 动漫、5 短剧、21 AI剧 不收录）
+//  - 搜索：GET /api/vod/search?wd=&page=（JSON，每页 12）
+//  - 详情：GET /api/vod/detail/<id>（JSON，sources[].episodes[].url 直链 m3u8，带全站播放成功率 health）
+// =====================================================================
+
+var PF_ORIGIN = "https://pandflix.com";
+var PF_LIMIT = 30;
+var PF_FROM_NAMES = {
+  ffm3u8: "非凡", rym3u8: "如意", bfzym3u8: "暴风", gsm3u8: "光速", lzm3u8: "量子", wjm3u8: "无尽", wolong: "卧龙",
+  hnm3u8: "红牛", ikm3u8: "iKun", jsm3u8: "极速", sdm3u8: "闪电", yhm3u8: "樱花", tkm3u8: "天空", snm3u8: "索尼",
+  "1080zyk": "1080资源", xlm3u8: "新浪", jinyingm3u8: "金鹰", hhm3u8: "豪华", mdm3u8: "魔都", zuidam3u8: "最大",
+};
+
+function pfParseLink(link) {
+  var m = /^pf:(\d+)(?::(\d+))?$/.exec(String(link || ""));
+  return m ? { id: m[1], ep: parseInt(m[2] || "0", 10) || 0 } : null;
+}
+function pfLink(id, ep) {
+  return "pf:" + id + ":" + (ep || 0);
+}
+function pfImg(u) {
+  u = String(u || "").trim();
+  if (!u || /^data:/.test(u)) return "";
+  if (u.indexOf("//") === 0) return "https:" + u;
+  if (u.charAt(0) === "/") return PF_ORIGIN + u;
+  return u;
+}
+function pfItem(x) {
+  var l = pfLink(x.id, 0);
+  var isMovie = Number(x.typeId) === 1;
+  var it = { id: l, type: "url", title: vsText(x.name) || String(x.id), mediaType: isMovie ? "movie" : "tv", link: l };
+  var c = pfImg(x.picture);
+  if (c) { it.posterPath = c; it.coverUrl = c; }
+  var b = pfImg(x.backdrop);
+  if (b) it.backdropPath = b;
+  if (x.remarks) it.durationText = vsText(x.remarks);
+  if (x.year) it.releaseDate = String(x.year);
+  var sc = Number(x.doubanScore) || 0;
+  if (sc) it.rating = sc;
+  var sub = [x.year, x.area, x.typeName].filter(Boolean).join(" · ");
+  if (sub) it.description = sub;
+  return it;
+}
+async function pfJson(path, label) {
+  var d = await vsGet(PF_ORIGIN + path, { Accept: "application/json", Referer: PF_ORIGIN + "/" }, label);
+  if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { d = null; } }
+  if (!d) throw new Error(label + " 返回异常");
+  return d;
+}
+
+async function loadPfList(params) {
+  params = params || {};
+  var page = vsPageNo(params);
+  var sort = params.sort || "time";
+  var d = await pfJson("/api/vod/browse" + vsQs({
+    type: params.type || "1", cls: params.cls, area: params.area, lang: params.lang, year: params.year,
+    sort: sort === "time" ? "" : sort, page: page, limit: PF_LIMIT,
+  }), "PandFlix 列表");
+  if (!Array.isArray(d.items)) return [];
+  if (d.total && (page - 1) * PF_LIMIT >= d.total) return [];
+  return vsDedup(d.items.map(pfItem));
+}
+
+async function pfSearch(kw, page) {
+  var d = await pfJson("/api/vod/search" + vsQs({ wd: kw, page: page > 1 ? page : "" }), "PandFlix 搜索");
+  if (!Array.isArray(d.items)) return [];
+  if (d.pageCount && page > d.pageCount) return [];
+  return vsDedup(d.items.map(pfItem));
+}
+
+var PF_CACHE = {};
+async function pfInfo(id) {
+  var c = PF_CACHE[id];
+  if (c && Date.now() - c.at < 300000) return c.d;
+  var d = await pfJson("/api/vod/detail/" + id, "PandFlix 详情");
+  PF_CACHE[id] = { at: Date.now(), d: d };
+  return d;
+}
+
+// 线路：无水印优先，再按全站首播成功率排序
+function pfLines(d) {
+  var lines = (d.sources || []).filter(function (s) { return s && Array.isArray(s.episodes) && s.episodes.length; });
+  function rate(s) {
+    var h = (s.episodes[0] && s.episodes[0].health) || {};
+    return typeof h.successRate === "number" ? h.successRate : 0.5;
+  }
+  lines.sort(function (a, b) {
+    var wa = a.kind === "watermark" ? 1 : 0, wb = b.kind === "watermark" ? 1 : 0;
+    if (wa !== wb) return wa - wb;
+    return rate(b) - rate(a);
+  });
+  return lines;
+}
+function pfPrimary(lines) {
+  var best = null;
+  lines.forEach(function (l) { if (!best || l.episodes.length > best.episodes.length) best = l; });
+  return best;
+}
+function pfFindEp(line, primary, n) {
+  var want = primary.episodes[n - 1];
+  if (want) {
+    for (var i = 0; i < line.episodes.length; i++) if (line.episodes[i].name === want.name) return line.episodes[i];
+  }
+  return line.episodes[n - 1] || null;
+}
+function pfSources(d, n, max) {
+  var lines = pfLines(d);
+  var primary = pfPrimary(lines);
+  if (!primary) return [];
+  var out = [], seen = {};
+  for (var i = 0; i < lines.length && out.length < (max || 8); i++) {
+    var ep = pfFindEp(lines[i], primary, n);
+    if (!ep || !ep.url || seen[ep.url]) continue;
+    seen[ep.url] = true;
+    var sid = ep.sourceId || lines[i].id || "";
+    var nm = PF_FROM_NAMES[sid] || sid || lines[i].name;
+    var h = ep.health || {};
+    var desc = (ep.name || "第" + n + "集") + (/\.mp4(\?|$)/i.test(ep.url) ? " · MP4" : " · HLS");
+    if (lines[i].kind === "watermark") desc += " · 有水印";
+    if (typeof h.successRate === "number" && h.samples > 20) desc += " · 成功率 " + Math.round(h.successRate * 100) + "%";
+    out.push({ name: "线路" + (out.length + 1) + "（" + nm + "）", description: desc, url: ep.url, customHeaders: { "User-Agent": VS_UA }, playerType: "app" });
+  }
+  return out;
+}
+
+async function pfLoadDetail(link) {
+  var ref = pfParseLink(link);
+  if (!ref) return null;
+  var d = await pfInfo(ref.id);
+  var item = pfItem(d);
+  var lines = pfLines(d);
+  var primary = pfPrimary(lines);
+  var isMovie = Number(d.typeId) === 1 || (primary ? primary.episodes.length === 1 : false);
+  item.mediaType = isMovie ? "movie" : "tv";
+  if (d.typeName) item.genreTitle = d.typeName;
+  var desc = [];
+  if (d.subTitle) desc.push("又名：" + vsText(d.subTitle));
+  var meta = [d.remarks, d.year, d.area, d.language].filter(Boolean).join(" · ");
+  if (meta) desc.push(meta + (Number(d.doubanScore) ? " · 豆瓣 " + d.doubanScore : ""));
+  if (d.director) desc.push("导演：" + vsText(d.director));
+  var actors = String(d.actors || "").split(/[,，、\/]/).map(vsText).filter(Boolean);
+  if (actors.length) desc.push("主演：" + actors.slice(0, 8).join("、"));
+  if (d.content) desc.push(vsText(d.content));
+  item.description = desc.join("\n");
+  if (actors.length) item.peoples = actors.slice(0, 12).map(function (n, i) { return { id: "actor-" + i, title: n, role: "演员" }; });
+  if (!primary) {
+    item.description += "\n（暂无可用播放源）";
+    return item;
+  }
+  item.episodeItems = primary.episodes.map(function (e, i) {
+    var l = pfLink(ref.id, i + 1);
+    var ep = { id: l, type: "url", title: e.name || "第" + (i + 1) + "集", mediaType: item.mediaType, episode: i + 1, link: l };
+    if (item.coverUrl) ep.coverUrl = item.coverUrl;
+    return ep;
+  });
+  var first = pfSources(d, ref.ep || 1, 1);
+  if (first.length) { item.videoUrl = first[0].url; item.playerType = "app"; }
+  if (ref.ep) { item.id = pfLink(ref.id, ref.ep); item.link = item.id; item.episode = ref.ep; }
+  return item;
+}
+
+async function pfLoadResource(params) {
+  var ref = pfParseLink(params.link || params.id);
+  if (!ref) return [];
+  var n = ref.ep || parseInt(params.episode, 10) || 1;
+  var d = await pfInfo(ref.id);
+  return pfSources(d, n, 8);
 }
