@@ -1,8 +1,9 @@
 /**
  * 热门短剧 · Rex / Forward 模块（ForwardWidget 格式）
- * 来源：西瓜短剧 m.xgshort.com（站点公开接口 + 游客登录）
+ * 来源：西瓜短剧 m.xgshort.com（站点公开接口 + 游客登录）+ PandFlix pandflix.com（短剧 / AI剧，JSON 接口）
  *  - 频道：短剧、AI短剧；筛选：排序 / 题材 / 年份 / 状态
- *  - 搜索走 Rex 自带搜索页（顶层 search），同时搜 短剧 + AI短剧
+ *  - PandFlix：短剧（排序/题材/年份）、AI剧（排序/年份），link 前缀 pf:，直链 m3u8 多线路
+ *  - 搜索走 Rex 自带搜索页（顶层 search），西瓜 短剧 + AI短剧 在前，PandFlix 短剧 / AI剧 在后
  *  - 分集与播放地址需要游客 token，模块自动领取并缓存（7 天）
  *  - 已过滤同性 / 男同题材
  */
@@ -12,10 +13,10 @@ WidgetMetadata = {
   "icon": "https://m.xgshort.com/xiguaLogo.png",
   "iconUrl": "https://m.xgshort.com/xiguaLogo.png",
   "logo": "https://m.xgshort.com/xiguaLogo.png",
-  "description": "热门短剧（西瓜短剧 m.xgshort.com）：最新更新、短剧 / AI短剧，排序、题材、年份、状态筛选，搜索，分集播放（已过滤男同题材）",
+  "description": "热门短剧（西瓜短剧 m.xgshort.com + PandFlix pandflix.com）：最新更新、短剧 / AI短剧、PandFlix 短剧 / AI剧，排序、题材、年份筛选，两站聚合搜索，分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.25.3",
+  "version": "2026.11.27.1",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -987,6 +988,252 @@ WidgetMetadata = {
       ]
     },
     {
+      "id": "pf_short",
+      "title": "PandFlix·短剧",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "5"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分最高",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "cls",
+          "title": "题材",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "都市",
+              "value": "都市"
+            },
+            {
+              "title": "古装",
+              "value": "古装"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "逆袭",
+              "value": "逆袭"
+            },
+            {
+              "title": "甜宠",
+              "value": "甜宠"
+            },
+            {
+              "title": "穿越",
+              "value": "穿越"
+            },
+            {
+              "title": "重生",
+              "value": "重生"
+            },
+            {
+              "title": "玄幻",
+              "value": "玄幻"
+            },
+            {
+              "title": "奇幻",
+              "value": "奇幻"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "家庭",
+              "value": "家庭"
+            },
+            {
+              "title": "复仇",
+              "value": "复仇"
+            },
+            {
+              "title": "青春",
+              "value": "青春"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "战神",
+              "value": "战神"
+            },
+            {
+              "title": "年代",
+              "value": "年代"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "pf_ai",
+      "title": "PandFlix·AI剧",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "21"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分最高",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
       "id": "loadResource",
       "title": "加载资源",
       "functionName": "loadResource",
@@ -1198,7 +1445,7 @@ async function loadList(params) {
   return xgMap(d && d.data && d.data.list);
 }
 
-async function search(params) {
+async function xgSearch(params) {
   params = params || {};
   var kw = String(params.keyword || params.query || "").trim();
   if (!kw) return [];
@@ -1262,7 +1509,7 @@ async function xgEpisodes(sid) {
   return (d && d.data) || {};
 }
 
-async function loadDetail(link) {
+async function xgLoadDetail(link) {
   var ref = xgParseLink(link);
   if (!ref) return null;
   var data = await xgEpisodes(ref.sid);
@@ -1310,7 +1557,7 @@ async function loadDetail(link) {
   return item;
 }
 
-async function loadResource(params) {
+async function xgLoadResource(params) {
   params = params || {};
   var ref = xgParseLink(params.link || params.id);
   if (!ref) return [];
@@ -1345,4 +1592,222 @@ async function loadLatest(params) {
   }
   all.sort(function (a, b) { return String(b.createdAt || "").localeCompare(String(a.createdAt || "")); });
   return xgMap(all);
+}
+
+
+// ---------------------------------------------------------------------------
+// PandFlix pandflix.com 短剧 / AI剧   link：pf:<id>:<集序号，0=整部>
+//  列表 GET /api/vod/browse?type=5|21&cls=&year=&sort=&page=&limit=30（JSON）
+//  搜索 GET /api/vod/search?wd=&page=（全站混合，只保留 短剧 / AI剧）
+//  详情 GET /api/vod/detail/<id>（sources[].episodes[].url 直链 m3u8，带全站播放成功率）
+//  已过滤：站点「同性」分类的全部条目（构建时抓取 ID）+ 标题关键词
+// ---------------------------------------------------------------------------
+var PF_ORIGIN = "https://pandflix.com";
+var PF_PREFIX = "pf:";
+var PF_LIMIT = 30;
+var PF_TYPES = { "5": "短剧", "21": "AI剧" };
+var PF_BLOCK = {};
+var PF_BLOCK_IDS = [30087, 29806, 18812, 5299, 24391, 676, 244202, 22802, 181726, 241566, 189193, 252074, 242812, 242360, 244119, 6426, 25524, 24535, 30996, 5302, 276427, 244808, 245004, 242258, 253375, 251290, 15545, 252717, 25449, 26793, 3124, 8401, 6376, 1408, 559, 16093, 6479, 107136, 6465, 44682, 7879, 45173, 6438, 45892, 172124, 46696, 172322, 172371, 172287, 172407, 172408, 172421, 172441, 172442, 172449, 172372, 172505, 8371, 172485, 172615, 172542, 6487, 6472, 2367, 27559, 6471, 6464, 41921, 6477, 36824, 45446, 46193, 47720, 6406, 32115, 6455, 133433, 50059, 117676, 243695];
+PF_BLOCK_IDS.forEach(function (i) { PF_BLOCK[String(i)] = 1; });
+var PF_FROM_NAMES = {
+  ffm3u8: "非凡", rym3u8: "如意", bfzym3u8: "暴风", gsm3u8: "光速", lzm3u8: "量子", wjm3u8: "无尽", wolong: "卧龙",
+  hnm3u8: "红牛", ikm3u8: "iKun", jsm3u8: "极速", sdm3u8: "闪电", yhm3u8: "樱花", tkm3u8: "天空", snm3u8: "索尼",
+  "1080zyk": "1080资源", xlm3u8: "新浪", jinyingm3u8: "金鹰", hhm3u8: "豪华", mdm3u8: "魔都", zuidam3u8: "最大",
+};
+
+function pfText(s) {
+  return String(s == null ? "" : s).replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+}
+function pfParseLink(link) {
+  var m = /^pf:(\d+)(?::(\d+))?$/.exec(String(link || ""));
+  return m ? { id: m[1], ep: parseInt(m[2] || "0", 10) || 0 } : null;
+}
+function pfLink(id, ep) { return PF_PREFIX + id + ":" + (ep || 0); }
+function pfImg(u) {
+  u = String(u || "").trim();
+  if (!u || /^data:/.test(u)) return "";
+  if (u.indexOf("//") === 0) return "https:" + u;
+  if (u.charAt(0) === "/") return PF_ORIGIN + u;
+  return u;
+}
+function pfBlocked(x) {
+  if (!x) return true;
+  if (PF_BLOCK[String(x.id)]) return true;
+  return XG_BLOCK_RE.test(String(x.name || "")) || /同性/.test(String(x.cls || x.className || ""));
+}
+function pfItem(x) {
+  if (!x || !x.id || pfBlocked(x)) return null;
+  var l = pfLink(x.id, 0);
+  var it = { id: l, type: "url", title: pfText(x.name) || String(x.id), mediaType: "tv", link: l };
+  var c = pfImg(x.picture);
+  if (c) { it.posterPath = c; it.coverUrl = c; }
+  var b = pfImg(x.backdrop);
+  if (b) it.backdropPath = b;
+  var bits = ["PandFlix"];
+  if (x.typeName) bits.push(String(x.typeName));
+  if (x.remarks) bits.push(pfText(x.remarks));
+  it.durationText = bits.join(" · ");
+  if (x.year) it.releaseDate = String(x.year);
+  var sc = Number(x.doubanScore) || parseFloat(x.score) || 0;
+  if (sc) it.rating = sc;
+  if (x.content) it.description = pfText(x.content);
+  return it;
+}
+function pfMap(list) {
+  var out = [], seen = {};
+  (list || []).forEach(function (x) {
+    var it = pfItem(x);
+    if (it && !seen[it.id]) { seen[it.id] = 1; out.push(it); }
+  });
+  return out;
+}
+async function pfJson(path, label) {
+  var res = await Widget.http.get(PF_ORIGIN + path, { headers: { "User-Agent": XG_UA, Accept: "application/json", Referer: PF_ORIGIN + "/" } });
+  var d = xgJson(res);
+  if (!d) throw new Error(label + " 无响应" + (res && res.statusCode ? "（HTTP " + res.statusCode + "）" : ""));
+  return d;
+}
+
+async function loadPfList(params) {
+  params = params || {};
+  var type = String(params.type || "5");
+  if (params.cls === "同性") return [];
+  var page = xgPage(params);
+  var sort = params.sort || "time";
+  var d = await pfJson("/api/vod/browse" + xgQuery({
+    type: type, cls: params.cls, year: params.year, sort: sort === "time" ? "" : sort, page: page, limit: PF_LIMIT,
+  }), "PandFlix 列表");
+  if (!Array.isArray(d.items)) return [];
+  if (d.total && (page - 1) * PF_LIMIT >= d.total) return [];
+  return pfMap(d.items);
+}
+
+async function pfSearch(kw, page) {
+  var d = await pfJson("/api/vod/search" + xgQuery({ wd: kw, page: page > 1 ? page : "" }), "PandFlix 搜索");
+  if (!Array.isArray(d.items)) return [];
+  if (d.pageCount && page > d.pageCount) return [];
+  return pfMap(d.items.filter(function (x) { return PF_TYPES[String(x.typeId)]; }));
+}
+
+var PF_CACHE = {};
+async function pfInfo(id) {
+  var c = PF_CACHE[id];
+  if (c && Date.now() - c.at < 300000) return c.d;
+  var d = await pfJson("/api/vod/detail/" + id, "PandFlix 详情");
+  PF_CACHE[id] = { at: Date.now(), d: d };
+  return d;
+}
+// 线路：无水印优先，再按全站首播成功率排序
+function pfLines(d) {
+  var lines = (d.sources || []).filter(function (s) { return s && Array.isArray(s.episodes) && s.episodes.length; });
+  function rate(s) {
+    var h = (s.episodes[0] && s.episodes[0].health) || {};
+    return typeof h.successRate === "number" ? h.successRate : 0.5;
+  }
+  lines.sort(function (a, b) {
+    // clean 优先，含广告 / 水印的排后
+    var wa = a.kind && a.kind !== "clean" ? 1 : 0, wb = b.kind && b.kind !== "clean" ? 1 : 0;
+    if (wa !== wb) return wa - wb;
+    return rate(b) - rate(a);
+  });
+  return lines;
+}
+function pfPrimary(lines) {
+  var best = null;
+  lines.forEach(function (l) { if (!best || l.episodes.length > best.episodes.length) best = l; });
+  return best;
+}
+function pfFindEp(line, primary, n) {
+  var want = primary.episodes[n - 1];
+  if (want) {
+    for (var i = 0; i < line.episodes.length; i++) if (line.episodes[i].name === want.name) return line.episodes[i];
+  }
+  // 只有「全集」一条的线路只在整部只有 1 集时可用
+  if (line.episodes.length === 1 && primary.episodes.length > 1) return null;
+  return line.episodes[n - 1] || null;
+}
+function pfSources(d, n, max) {
+  var lines = pfLines(d);
+  var primary = pfPrimary(lines);
+  if (!primary) return [];
+  var out = [], seen = {};
+  for (var i = 0; i < lines.length && out.length < (max || 8); i++) {
+    var ep = pfFindEp(lines[i], primary, n);
+    if (!ep || !ep.url || seen[ep.url]) continue;
+    seen[ep.url] = true;
+    var sid = ep.sourceId || lines[i].id || "";
+    var nm = PF_FROM_NAMES[sid] || sid || lines[i].name;
+    var h = ep.health || {};
+    var desc = (ep.name || "第" + n + "集") + (/\.mp4(\?|$)/i.test(ep.url) ? " · MP4" : " · HLS");
+    if (lines[i].kind === "watermark") desc += " · 有水印";
+    else if (lines[i].kind === "ad") desc += " · 含广告";
+    if (typeof h.successRate === "number" && h.samples > 20) desc += " · 成功率 " + Math.round(h.successRate * 100) + "%";
+    out.push({ name: "线路" + (out.length + 1) + "（" + nm + "）", description: desc, url: ep.url, customHeaders: { "User-Agent": XG_UA }, playerType: "app" });
+  }
+  return out;
+}
+
+async function pfLoadDetail(link) {
+  var ref = pfParseLink(link);
+  if (!ref) return null;
+  var d = await pfInfo(ref.id);
+  var item = pfItem(d);
+  if (!item) return null;
+  var lines = pfLines(d);
+  var primary = pfPrimary(lines);
+  if (d.typeName) item.genreTitle = d.typeName;
+  var desc = [];
+  var meta = [d.remarks, d.year, d.area, d.typeName].filter(Boolean).map(pfText).join(" · ");
+  if (meta) desc.push(meta);
+  var actors = String(d.actors || "").split(/[,，、\/]/).map(pfText).filter(Boolean);
+  if (actors.length) desc.push("主演：" + actors.slice(0, 8).join("、"));
+  if (d.content) desc.push(pfText(d.content));
+  item.description = desc.join("\n");
+  if (actors.length) item.peoples = actors.slice(0, 12).map(function (n, i) { return { id: "actor-" + i, title: n, role: "演员" }; });
+  if (!primary) {
+    item.description += "\n（暂无可用播放源）";
+    return item;
+  }
+  item.episodeItems = primary.episodes.map(function (e, i) {
+    var l = pfLink(ref.id, i + 1);
+    var ep = { id: l, type: "url", title: e.name || "第" + (i + 1) + "集", mediaType: "tv", episode: i + 1, link: l };
+    if (item.coverUrl) ep.coverUrl = item.coverUrl;
+    return ep;
+  });
+  item.durationText += " · " + item.episodeItems.length + "集";
+  var first = pfSources(d, ref.ep || 1, 1);
+  if (first.length) { item.videoUrl = first[0].url; item.playerType = "app"; }
+  if (ref.ep) { item.id = pfLink(ref.id, ref.ep); item.link = item.id; item.episode = ref.ep; }
+  return item;
+}
+
+async function pfLoadResource(params) {
+  var ref = pfParseLink(params.link || params.id);
+  if (!ref) return [];
+  var n = ref.ep || parseInt(params.episode, 10) || 1;
+  var d = await pfInfo(ref.id);
+  return pfSources(d, n, 8);
+}
+
+// ---------------------------------------------------------------------------
+// 分发：pf: → PandFlix，其余 → 西瓜短剧
+// ---------------------------------------------------------------------------
+async function loadDetail(link) {
+  if (String(link || "").indexOf(PF_PREFIX) === 0) return pfLoadDetail(link);
+  return xgLoadDetail(link);
+}
+async function loadResource(params) {
+  params = params || {};
+  if (String(params.link || params.id || "").indexOf(PF_PREFIX) === 0) return pfLoadResource(params);
+  return xgLoadResource(params);
+}
+// 搜索：西瓜短剧在前，PandFlix 短剧 / AI剧在后
+async function search(params) {
+  params = params || {};
+  var kw = String(params.keyword || params.query || "").trim();
+  if (!kw) return [];
+  var out = [];
+  try { out = await xgSearch(params); } catch (e) { console.log("[热门短剧] 西瓜搜索失败:", e && e.message); }
+  try { out = out.concat(await pfSearch(kw, xgPage(params))); } catch (e) { console.log("[热门短剧] PandFlix 搜索失败:", e && e.message); }
+  return out;
 }
