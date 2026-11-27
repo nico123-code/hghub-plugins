@@ -1,5 +1,5 @@
 /**
- * 热门短剧 · Rex / Forward 模块（ForwardWidget 格式）
+ * 短剧聚合 · Rex / Forward 模块（ForwardWidget 格式）
  * 来源：西瓜短剧 m.xgshort.com（站点公开接口 + 游客登录）+ PandFlix pandflix.com（短剧 / AI剧，JSON 接口）
  *  - 频道：短剧、AI短剧；筛选：排序 / 题材 / 年份 / 状态
  *  - PandFlix（置顶）：短剧（排序/题材/年份）、AI剧（排序/年份），link 前缀 pf:，直链 m3u8 多线路
@@ -9,14 +9,14 @@
  */
 WidgetMetadata = {
   "id": "hghub.xgshort",
-  "title": "热门短剧",
+  "title": "短剧聚合",
   "icon": "https://m.xgshort.com/xiguaLogo.png",
   "iconUrl": "https://m.xgshort.com/xiguaLogo.png",
   "logo": "https://m.xgshort.com/xiguaLogo.png",
-  "description": "热门短剧（PandFlix pandflix.com + 西瓜短剧 m.xgshort.com）：PandFlix 短剧 / AI剧、最新更新、短剧 / AI短剧，排序、题材、年份筛选，两站聚合搜索（PandFlix 在前），分集播放（已过滤男同题材）",
+  "description": "短剧聚合（PandFlix pandflix.com + 西瓜短剧 m.xgshort.com）：PandFlix 短剧 / AI剧、最新更新、短剧 / AI短剧，排序、题材、年份筛选，两站聚合搜索（PandFlix 在前），分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.27.2",
+  "version": "2026.11.27.3",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
@@ -1461,7 +1461,7 @@ async function xgSearch(params) {
       var rest = l.filter(function (x) { return x.title !== kw; });
       all = all.concat(same, rest);
     } catch (e) {
-      console.log("[热门短剧] 搜索失败:", cats[i], e && e.message);
+      console.log("[短剧聚合] 搜索失败:", cats[i], e && e.message);
     }
   }
   return xgMap(all);
@@ -1546,7 +1546,7 @@ async function xgLoadDetail(link) {
         item.playerType = "app";
       }
     } catch (e) {
-      console.log("[热门短剧] 预取播放地址失败:", e && e.message);
+      console.log("[短剧聚合] 预取播放地址失败:", e && e.message);
     }
   }
   if (ref.ep) {
@@ -1587,7 +1587,7 @@ async function loadLatest(params) {
       var d = await xgGet("/api/list/getfiltersdata", { channeid: chs[i], ids: "0,0,0,0,0,0,0", page: page, size: 20 }, false);
       all = all.concat((d && d.data && d.data.list) || []);
     } catch (e) {
-      console.log("[热门短剧] 最新更新失败:", chs[i], e && e.message);
+      console.log("[短剧聚合] 最新更新失败:", chs[i], e && e.message);
     }
   }
   all.sort(function (a, b) { return String(b.createdAt || "").localeCompare(String(a.createdAt || "")); });
@@ -1807,7 +1807,7 @@ async function search(params) {
   var kw = String(params.keyword || params.query || "").trim();
   if (!kw) return [];
   var out = [];
-  try { out = await pfSearch(kw, xgPage(params)); } catch (e) { console.log("[热门短剧] PandFlix 搜索失败:", e && e.message); }
-  try { out = out.concat(await xgSearch(params)); } catch (e) { console.log("[热门短剧] 西瓜搜索失败:", e && e.message); }
+  try { out = await pfSearch(kw, xgPage(params)); } catch (e) { console.log("[短剧聚合] PandFlix 搜索失败:", e && e.message); }
+  try { out = out.concat(await xgSearch(params)); } catch (e) { console.log("[短剧聚合] 西瓜搜索失败:", e && e.message); }
   return out;
 }
