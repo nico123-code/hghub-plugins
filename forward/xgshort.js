@@ -2,8 +2,8 @@
  * 热门短剧 · Rex / Forward 模块（ForwardWidget 格式）
  * 来源：西瓜短剧 m.xgshort.com（站点公开接口 + 游客登录）+ PandFlix pandflix.com（短剧 / AI剧，JSON 接口）
  *  - 频道：短剧、AI短剧；筛选：排序 / 题材 / 年份 / 状态
- *  - PandFlix：短剧（排序/题材/年份）、AI剧（排序/年份），link 前缀 pf:，直链 m3u8 多线路
- *  - 搜索走 Rex 自带搜索页（顶层 search），西瓜 短剧 + AI短剧 在前，PandFlix 短剧 / AI剧 在后
+ *  - PandFlix（置顶）：短剧（排序/题材/年份）、AI剧（排序/年份），link 前缀 pf:，直链 m3u8 多线路
+ *  - 搜索走 Rex 自带搜索页（顶层 search），PandFlix 短剧 / AI剧 在前，西瓜 短剧 + AI短剧 在后
  *  - 分集与播放地址需要游客 token，模块自动领取并缓存（7 天）
  *  - 已过滤同性 / 男同题材
  */
@@ -13,13 +13,259 @@ WidgetMetadata = {
   "icon": "https://m.xgshort.com/xiguaLogo.png",
   "iconUrl": "https://m.xgshort.com/xiguaLogo.png",
   "logo": "https://m.xgshort.com/xiguaLogo.png",
-  "description": "热门短剧（西瓜短剧 m.xgshort.com + PandFlix pandflix.com）：最新更新、短剧 / AI短剧、PandFlix 短剧 / AI剧，排序、题材、年份筛选，两站聚合搜索，分集播放（已过滤男同题材）",
+  "description": "热门短剧（PandFlix pandflix.com + 西瓜短剧 m.xgshort.com）：PandFlix 短剧 / AI剧、最新更新、短剧 / AI短剧，排序、题材、年份筛选，两站聚合搜索（PandFlix 在前），分集播放（已过滤男同题材）",
   "author": "nico123-code",
   "site": "https://github.com/nico123-code/hghub-plugins",
-  "version": "2026.11.27.1",
+  "version": "2026.11.27.2",
   "requiredVersion": "0.0.2",
   "detailCacheDuration": 300,
   "modules": [
+    {
+      "id": "pf_short",
+      "title": "PandFlix·短剧",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "5"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分最高",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "cls",
+          "title": "题材",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "都市",
+              "value": "都市"
+            },
+            {
+              "title": "古装",
+              "value": "古装"
+            },
+            {
+              "title": "爱情",
+              "value": "爱情"
+            },
+            {
+              "title": "逆袭",
+              "value": "逆袭"
+            },
+            {
+              "title": "甜宠",
+              "value": "甜宠"
+            },
+            {
+              "title": "穿越",
+              "value": "穿越"
+            },
+            {
+              "title": "重生",
+              "value": "重生"
+            },
+            {
+              "title": "玄幻",
+              "value": "玄幻"
+            },
+            {
+              "title": "奇幻",
+              "value": "奇幻"
+            },
+            {
+              "title": "悬疑",
+              "value": "悬疑"
+            },
+            {
+              "title": "喜剧",
+              "value": "喜剧"
+            },
+            {
+              "title": "家庭",
+              "value": "家庭"
+            },
+            {
+              "title": "复仇",
+              "value": "复仇"
+            },
+            {
+              "title": "青春",
+              "value": "青春"
+            },
+            {
+              "title": "科幻",
+              "value": "科幻"
+            },
+            {
+              "title": "战神",
+              "value": "战神"
+            },
+            {
+              "title": "年代",
+              "value": "年代"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
+    {
+      "id": "pf_ai",
+      "title": "PandFlix·AI剧",
+      "functionName": "loadPfList",
+      "cacheDuration": 300,
+      "params": [
+        {
+          "name": "type",
+          "title": "频道",
+          "type": "constant",
+          "value": "21"
+        },
+        {
+          "name": "sort",
+          "title": "排序",
+          "type": "enumeration",
+          "value": "time",
+          "enumOptions": [
+            {
+              "title": "最新",
+              "value": "time"
+            },
+            {
+              "title": "最热",
+              "value": "hits"
+            },
+            {
+              "title": "评分最高",
+              "value": "score"
+            }
+          ]
+        },
+        {
+          "name": "year",
+          "title": "年份",
+          "type": "enumeration",
+          "value": "",
+          "enumOptions": [
+            {
+              "title": "全部",
+              "value": ""
+            },
+            {
+              "title": "2026",
+              "value": "2026"
+            },
+            {
+              "title": "2025",
+              "value": "2025"
+            },
+            {
+              "title": "2024",
+              "value": "2024"
+            },
+            {
+              "title": "2023",
+              "value": "2023"
+            },
+            {
+              "title": "2022",
+              "value": "2022"
+            },
+            {
+              "title": "2021",
+              "value": "2021"
+            },
+            {
+              "title": "2020",
+              "value": "2020"
+            },
+            {
+              "title": "2019",
+              "value": "2019"
+            }
+          ]
+        },
+        {
+          "name": "page",
+          "title": "页码",
+          "type": "page"
+        }
+      ]
+    },
     {
       "id": "latest",
       "title": "最新更新",
@@ -988,252 +1234,6 @@ WidgetMetadata = {
       ]
     },
     {
-      "id": "pf_short",
-      "title": "PandFlix·短剧",
-      "functionName": "loadPfList",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "type",
-          "title": "频道",
-          "type": "constant",
-          "value": "5"
-        },
-        {
-          "name": "sort",
-          "title": "排序",
-          "type": "enumeration",
-          "value": "time",
-          "enumOptions": [
-            {
-              "title": "最新",
-              "value": "time"
-            },
-            {
-              "title": "最热",
-              "value": "hits"
-            },
-            {
-              "title": "评分最高",
-              "value": "score"
-            }
-          ]
-        },
-        {
-          "name": "cls",
-          "title": "题材",
-          "type": "enumeration",
-          "value": "",
-          "enumOptions": [
-            {
-              "title": "全部",
-              "value": ""
-            },
-            {
-              "title": "都市",
-              "value": "都市"
-            },
-            {
-              "title": "古装",
-              "value": "古装"
-            },
-            {
-              "title": "爱情",
-              "value": "爱情"
-            },
-            {
-              "title": "逆袭",
-              "value": "逆袭"
-            },
-            {
-              "title": "甜宠",
-              "value": "甜宠"
-            },
-            {
-              "title": "穿越",
-              "value": "穿越"
-            },
-            {
-              "title": "重生",
-              "value": "重生"
-            },
-            {
-              "title": "玄幻",
-              "value": "玄幻"
-            },
-            {
-              "title": "奇幻",
-              "value": "奇幻"
-            },
-            {
-              "title": "悬疑",
-              "value": "悬疑"
-            },
-            {
-              "title": "喜剧",
-              "value": "喜剧"
-            },
-            {
-              "title": "家庭",
-              "value": "家庭"
-            },
-            {
-              "title": "复仇",
-              "value": "复仇"
-            },
-            {
-              "title": "青春",
-              "value": "青春"
-            },
-            {
-              "title": "科幻",
-              "value": "科幻"
-            },
-            {
-              "title": "战神",
-              "value": "战神"
-            },
-            {
-              "title": "年代",
-              "value": "年代"
-            }
-          ]
-        },
-        {
-          "name": "year",
-          "title": "年份",
-          "type": "enumeration",
-          "value": "",
-          "enumOptions": [
-            {
-              "title": "全部",
-              "value": ""
-            },
-            {
-              "title": "2026",
-              "value": "2026"
-            },
-            {
-              "title": "2025",
-              "value": "2025"
-            },
-            {
-              "title": "2024",
-              "value": "2024"
-            },
-            {
-              "title": "2023",
-              "value": "2023"
-            },
-            {
-              "title": "2022",
-              "value": "2022"
-            },
-            {
-              "title": "2021",
-              "value": "2021"
-            },
-            {
-              "title": "2020",
-              "value": "2020"
-            },
-            {
-              "title": "2019",
-              "value": "2019"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
-    {
-      "id": "pf_ai",
-      "title": "PandFlix·AI剧",
-      "functionName": "loadPfList",
-      "cacheDuration": 300,
-      "params": [
-        {
-          "name": "type",
-          "title": "频道",
-          "type": "constant",
-          "value": "21"
-        },
-        {
-          "name": "sort",
-          "title": "排序",
-          "type": "enumeration",
-          "value": "time",
-          "enumOptions": [
-            {
-              "title": "最新",
-              "value": "time"
-            },
-            {
-              "title": "最热",
-              "value": "hits"
-            },
-            {
-              "title": "评分最高",
-              "value": "score"
-            }
-          ]
-        },
-        {
-          "name": "year",
-          "title": "年份",
-          "type": "enumeration",
-          "value": "",
-          "enumOptions": [
-            {
-              "title": "全部",
-              "value": ""
-            },
-            {
-              "title": "2026",
-              "value": "2026"
-            },
-            {
-              "title": "2025",
-              "value": "2025"
-            },
-            {
-              "title": "2024",
-              "value": "2024"
-            },
-            {
-              "title": "2023",
-              "value": "2023"
-            },
-            {
-              "title": "2022",
-              "value": "2022"
-            },
-            {
-              "title": "2021",
-              "value": "2021"
-            },
-            {
-              "title": "2020",
-              "value": "2020"
-            },
-            {
-              "title": "2019",
-              "value": "2019"
-            }
-          ]
-        },
-        {
-          "name": "page",
-          "title": "页码",
-          "type": "page"
-        }
-      ]
-    },
-    {
       "id": "loadResource",
       "title": "加载资源",
       "functionName": "loadResource",
@@ -1801,13 +1801,13 @@ async function loadResource(params) {
   if (String(params.link || params.id || "").indexOf(PF_PREFIX) === 0) return pfLoadResource(params);
   return xgLoadResource(params);
 }
-// 搜索：西瓜短剧在前，PandFlix 短剧 / AI剧在后
+// 搜索：PandFlix 短剧 / AI剧在前，西瓜短剧在后
 async function search(params) {
   params = params || {};
   var kw = String(params.keyword || params.query || "").trim();
   if (!kw) return [];
   var out = [];
-  try { out = await xgSearch(params); } catch (e) { console.log("[热门短剧] 西瓜搜索失败:", e && e.message); }
-  try { out = out.concat(await pfSearch(kw, xgPage(params))); } catch (e) { console.log("[热门短剧] PandFlix 搜索失败:", e && e.message); }
+  try { out = await pfSearch(kw, xgPage(params)); } catch (e) { console.log("[热门短剧] PandFlix 搜索失败:", e && e.message); }
+  try { out = out.concat(await xgSearch(params)); } catch (e) { console.log("[热门短剧] 西瓜搜索失败:", e && e.message); }
   return out;
 }
